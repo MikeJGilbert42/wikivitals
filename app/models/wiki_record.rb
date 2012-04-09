@@ -19,9 +19,19 @@ class WikiRecord
     @death_date.nil?
   end
 
+  #debug accessor
   def infobox
-    fetch
     @infobox
+  end
+
+  #debug accessor
+  def infohash
+    @infohash
+  end
+
+  #debug accessor
+  def response
+    @response
   end
 
   def death_date
@@ -35,7 +45,8 @@ class WikiRecord
   end
 
   def parse_date_template input
-    input =~ /\{\{(?:.*\|)(\d+)\|(\d+)\|(\d+)\|(:?(\d+)\|(\d+)\|(\d+))?\}\}/
+    # All we care about is the first three decimals in succession
+    input =~ /\{\{.*?(\d+)\|(\d+)\|(\d+).*}\}/
     Date.parse Regexp.last_match[1..3].reverse.join("-")
   end
 
@@ -46,9 +57,9 @@ class WikiRecord
     @is_person = Regexp.last_match(2) == "person"
     puts "That's not a person, dumbass." if !@is_person
 
-    data = @infobox.scan(/\|\s*(\S+)\s*=\s*(.*)\n/) #results in [["key","value"], ["key", "value"]...]
+    data = @infobox.scan(/^\|\s(.*)$/).flatten.map { |s| s.split(/\s*=\s*/, 2) } #[["x","y"], ["z", ""], ...]
     @infohash = {}
-    data.collect { |x| @infohash[x[0]] = x[1] }
+    data.collect { |x| @infohash[x[0]] = x[1] == "" ? nil : x[1] }
     #TODO: parse death date ex. "{{death date and age|1996|3|9|1896|1|20}}<br>({{age in years and days|1896|1|20|1996|3|9}})"
     if (@infohash["death_date"])
       @death_date = parse_date_template @infohash["death_date"]
@@ -74,6 +85,10 @@ class WikiRecord
         @page_name = Regexp.last_match[1]
         puts "You must be new here.  Redirecting to \"#{@page_name}\""
         @response = nil
+      end
+      if @response.body.include? "may refer to"
+        #TODO: Handle disambiguation pages.
+        raise "You're gonna have to be more specific."
       end
     end
     parse_info_box @response.body
