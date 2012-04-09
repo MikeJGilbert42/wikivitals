@@ -59,7 +59,7 @@ class WikiRecord
   end
 
   def fetch
-    if @response.nil?
+    while @response.nil?
       uri = URI.parse('http://en.wikipedia.org/w/index.php')
       params = { 'action' => 'raw', 'title' => "#{@page_name}" }
       http = Net::HTTP.new(uri.host, uri.port)
@@ -69,8 +69,13 @@ class WikiRecord
       @response = http.request request
       #puts @response
       raise "Y U NO GIVE GOOD QUERY: #{@response.code}" if @response.code != "200"
-    end
 
+      if @response.body =~ /\A\#REDIRECT\s\[\[(\S+)\]\]/
+        @page_name = Regexp.last_match[1]
+        puts "You must be new here.  Redirecting to \"#{@page_name}\""
+        @response = nil
+      end
+    end
     parse_info_box @response.body
   end
 end
