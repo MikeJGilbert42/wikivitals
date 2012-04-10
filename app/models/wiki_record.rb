@@ -39,6 +39,11 @@ class WikiRecord
     @death_date
   end
 
+  def birth_date
+    fetch
+    @birth_date
+  end
+
   def [](key)
     fetch
     instance_variable_get("@infohash")[key]
@@ -60,7 +65,6 @@ class WikiRecord
     data = @infobox.scan(/^\|\s(.*)$/).flatten.map { |s| s.split(/\s*=\s*/, 2) } #[["x","y"], ["z", ""], ...]
     @infohash = {}
     data.collect { |x| @infohash[x[0]] = x[1] == "" ? nil : x[1] }
-    #TODO: parse death date ex. "{{death date and age|1996|3|9|1896|1|20}}<br>({{age in years and days|1896|1|20|1996|3|9}})"
     if (@infohash["death_date"])
       @death_date = parse_date_template @infohash["death_date"]
     end
