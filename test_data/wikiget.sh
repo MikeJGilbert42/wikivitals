@@ -8,6 +8,8 @@ else
     ARTICLE="$1";
 fi
 
-OUTPUT_FILE="$2"
+OUTPUT_FILE="$1.raw"
 
-wget -qO- "http://en.wikipedia.org/w/index.php?action=raw&title=$ARTICLE" > $OUTPUT_FILE
+CMD="wget -qO- 'http://en.wikipedia.org/w/index.php?action=raw&title=$ARTICLE' > $OUTPUT_FILE"
+echo "Running $CMD..."
+eval $CMD
