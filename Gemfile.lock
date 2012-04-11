@@ -38,7 +38,7 @@ GEM
     coffee-script (2.2.0)
       coffee-script-source
       execjs
-    coffee-script-source (1.2.0)
+    coffee-script-source (1.3.1)
     columnize (0.3.6)
     crack (0.3.1)
     diff-lcs (1.1.3)
@@ -50,7 +50,15 @@ GEM
     factory_girl_rails (3.1.0)
       factory_girl (~> 3.1.0)
       railties (>= 3.0.0)
-    fakeweb (1.3.0)
+    ffi (1.0.11)
+    guard (1.0.1)
+      ffi (>= 0.5.0)
+      thor (~> 0.14.6)
+    guard-rspec (0.7.0)
+      guard (>= 0.10.0)
+    guard-spork (0.6.1)
+      guard (>= 0.10.0)
+      spork (>= 0.8.4)
     hike (1.2.1)
     i18n (0.6.0)
     journey (1.0.3)
@@ -63,9 +71,6 @@ GEM
       treetop (~> 1.4.8)
     mime-types (1.18)
     multi_json (1.2.0)
-    parallel (0.5.16)
-    parallel_tests (0.7.3)
-      parallel
     polyglot (0.3.3)
     rack (1.4.1)
     rack-cache (1.2)
@@ -129,7 +134,6 @@ GEM
     sqlite3 (1.3.5)
     thor (0.14.6)
     tilt (1.3.3)
-    timecop (0.3.5)
     treetop (1.4.10)
       polyglot
       polyglot (>= 0.3.1)
@@ -147,8 +151,9 @@ PLATFORMS
 DEPENDENCIES
   coffee-rails (~> 3.2.1)
   factory_girl_rails
-  fakeweb
-  parallel_tests
+  guard
+  guard-rspec
+  guard-spork
   rails (= 3.2.2)
   rspec-rails
   ruby-debug19
@@ -156,6 +161,5 @@ DEPENDENCIES
   shoulda-matchers
   spork
   sqlite3
-  timecop
   uglifier (>= 1.0.3)
   webmock

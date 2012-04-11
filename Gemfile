@@ -25,15 +25,15 @@ end
 
 group :test do
   gem "rspec-rails"
-  gem "fakeweb"
   gem "spork"
-  gem "parallel_tests"
   gem "shoulda-matchers"
-  gem "timecop"
   gem "webmock"
 end
 
 group :test, :development do
+  gem "guard"
+  gem "guard-spork"
+  gem "guard-rspec"
   gem "factory_girl_rails"
 #  gem "ruby-debug"
   gem 'ruby-debug19', :require => 'ruby-debug'
