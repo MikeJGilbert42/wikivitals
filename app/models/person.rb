@@ -5,11 +5,11 @@ class Person < ActiveRecord::Base
     accessible_attributes.to_a
   end
 
-  def new_from_wiki_record record
+  def self.new_from_wiki_record record
     if !record.person?
       raise "This article is not of a person."
     end
-    name = record["name"]
+    name = record[:name]
     death_date = record.death_date
     Person.create :name => name, :death_date => death_date
   end
