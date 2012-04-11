@@ -1,10 +1,7 @@
 class WikiRecord
 
-  require 'net/http'
-
   def initialize(page_name)
     @page_name = page_name
-    @response = nil
     @infobox = nil
     @is_person = false
   end
@@ -27,11 +24,6 @@ class WikiRecord
   #debug accessor
   def infohash
     @infohash
-  end
-
-  #debug accessor
-  def response
-    @response
   end
 
   def death_date
@@ -59,8 +51,7 @@ class WikiRecord
     #All the data extraction goes here.
     body =~ /(\{\{Infobox\s(\S+)\n(?:|.*\n)*\}\})/
     @infobox = Regexp.last_match 1
-    @is_person = Regexp.last_match(2) == "person"
-    puts "That's not a person, dumbass." if !@is_person
+    @is_person = Regexp.last_match(2) == "person" #TODO: this does not work for specific person types!
 
     data = @infobox.scan(/^\|\s(.*)$/).flatten.map { |s| s.split(/\s*=\s*/, 2) } #[["x","y"], ["z", ""], ...]
     @infohash = {}
@@ -74,27 +65,8 @@ class WikiRecord
   end
 
   def fetch
-    while @response.nil?
-      uri = URI.parse('http://en.wikipedia.org/w/index.php')
-      params = { 'action' => 'raw', 'title' => "#{@page_name}" }
-      http = Net::HTTP.new(uri.host, uri.port)
-      request = Net::HTTP::Get.new uri.path
-      request.set_form_data params
-      request = Net::HTTP::Get.new uri.path + '?' + request.body
-      @response = http.request request
-      #puts @response
-      raise "Y U NO GIVE GOOD QUERY: #{@response.code}" if @response.code != "200"
-
-      if @response.body =~ /\A\#REDIRECT\s\[\[(\S+)\]\]/
-        @page_name = Regexp.last_match[1]
-        puts "You must be new here.  Redirecting to \"#{@page_name}\""
-        @response = nil
-      end
-      if @response.body.include? "may refer to"
-        #TODO: Handle disambiguation pages.
-        raise "You're gonna have to be more specific."
-      end
-    end
-    parse_info_box @response.body
+    fetcher = WikiFetcher.new @page_name
+    @page = fetcher.get_page
+    parse_info_box @page
   end
 end
