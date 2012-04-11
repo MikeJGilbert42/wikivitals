@@ -62,11 +62,16 @@ class WikiRecord
     if (@infohash["birth_date"])
       @birth_date = parse_date_template @infohash["birth_date"]
     end
+
+    #Infer name if not present
+    @infohash["name"] = @page_name.sub('_', ' ') if @infohash["name"].nil?
   end
 
   def fetch
     fetcher = WikiFetcher.new @page_name
     @page = fetcher.get_page
+    # Store new page name if it changed
+    @page_name = fetcher.page_name
     parse_info_box @page
   end
 end

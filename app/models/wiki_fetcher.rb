@@ -21,6 +21,11 @@ class WikiFetcher
     body
   end
 
+  # For retrieving final article name after redirects, etc.
+  def page_name
+    return @page_name
+  end
+
   private
 
   def wiki_fetch wiki_url
