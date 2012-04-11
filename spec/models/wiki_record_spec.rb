@@ -27,13 +27,11 @@ describe WikiRecord do
       @sherlock.person?.should == false
     end
 
-    it "works on Albert Einstein", :wip => true do
-      #TODO: this doesn't work yet
+    it "works on Albert Einstein" do
       @einstein.person?.should == true
     end
 
-    it "works on Elvis", :wip => true do
-      #TODO: this doesn't work yet
+    it "works on Elvis" do
       @elvis.person?.should == true
     end
 

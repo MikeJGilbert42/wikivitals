@@ -41,9 +41,15 @@ class WikiRecord
     Date.parse Regexp.last_match[1..3].reverse.join("-")
   end
 
+  def has_persondata? body
+    body =~ /\{\{Persondata[^\}]*\}\}/
+    !Regexp.last_match.nil?
+  end
+
   def extract_infobox body
-    start_index = body =~ /\{\{Infobox\s([\w\s]+)/
+    start_index = body =~ /\{\{Infobox\s+([\w\s]+)/
     raise "Infobox was not found!" if !(start_index)
+    @person_type = Regexp.last_match(1)
     open = 0
     end_index = 0
     body[start_index..-1].split("").each_with_index do |c, index|
@@ -61,7 +67,6 @@ class WikiRecord
     #All the data extraction goes here.
     @infobox = extract_infobox body
     @infobox =~ /\{\{Infobox\s([\w ]+)/
-    @is_person = Regexp.last_match(1) == "person" #TODO: this does not work for specific person types!
 
     data = @infobox.scan(/^\|\s?(.*)$/).flatten.map { |s| s.split(/\s*=\s*/, 2) } #[["x","y"], ["z", ""], ...]
     @infohash = {}
@@ -83,11 +88,12 @@ class WikiRecord
   def fetch
     return if @fetched
     fetcher = WikiFetcher.new @page_name
-    @page = fetcher.get_page
+    page = fetcher.get_page
     # Store new page name if it changed
     @page_name = fetcher.page_name
-    raise "Whoops!  Something bad happened and I got no data to show for it" if @page.nil?
-    parse_info_box @page
+    raise "Whoops!  Something bad happened and I got no data to show for it" if page.nil?
+    parse_info_box page
+    @is_person = has_persondata? page
     @fetched = true
   end
 end
