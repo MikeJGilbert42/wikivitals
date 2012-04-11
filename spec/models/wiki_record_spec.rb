@@ -36,6 +36,11 @@ describe WikiRecord do
       #TODO: this doesn't work yet
       @elvis.person?.should == true
     end
+
+    it "works on Archduke Franz Ferdinand" do
+      franz = WikiRecord.new "Archduke_Franz_Ferdinand_of_Austria"
+      franz.person?.should == true
+    end
   end
 
   describe "#alive?" do
