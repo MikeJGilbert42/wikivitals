@@ -10,8 +10,8 @@ class WikiFetcher
     begin
       body = wiki_fetch @page_name
       redirect_to = nil
-      if body =~ /\A\#REDIRECT\s\[\[(\S+)\]\]/
-        redirect_to = Regexp.last_match[1]
+      if body =~ /\A\#REDIRECT\s\[\[([^\]]+)\]\]/
+        redirect_to = repair_link(Regexp.last_match[1])
       elsif body.include? "may refer to"
         #TODO: Handle disambiguation pages.
         raise "You're gonna have to be more specific."
@@ -39,5 +39,10 @@ class WikiFetcher
     #puts response
     raise "Y U NO GIVE GOOD QUERY: #{response.code}" if response.code != "200"
     response.body
+  end
+
+  # Typos have been encountered from time to time.
+  def repair_link link
+    link.sub(" ", "_")
   end
 end

@@ -33,5 +33,13 @@ describe WikiRecord do
     it "handles redirects" do
       @einstein["name"].should == "Albert Einstein"
     end
+    it "throws the right exception on disambiguation pages" do
+      david = WikiRecord.new "David_Thomas"
+      lambda { david.alive? }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
+    end
+    it "repairs redirects when the link is named improperly ([[David Thomas]] instead of [[David_Thomas]])" do
+      dave = WikiRecord.new "David_Thomas"
+      lambda { dave.alive? }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
+    end
   end
 end

@@ -2,8 +2,9 @@
 ---Extract a wikipedia article's raw info box string from the HTTP response
 ---Create a hashmap from the info box values
 ---Redo name columns as single column with spaces
-Spec #alive?
-Refactor WikiRecord to easily allow for mock replies (and use .raw files as response.body)
+---Spec #alive?
+---Refactor WikiRecord to easily allow for mock replies (and use .raw files as response.body)
+---Spec disambiguation page for correct exception
 Create Person record from WikiRecord (just name for now)
 Migrate new columns for birth and death dates (nils allowed for death date)
 Save birth and death dates into Person record (parse wiki templates for each)
