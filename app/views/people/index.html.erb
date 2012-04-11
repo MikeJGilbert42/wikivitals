@@ -4,7 +4,7 @@
 <table>
   <tr>
     <% @fields.each do |f| %>
-      <th><%= f %></th>
+      <th><%= f.humanize %></th>
     <% end %>
     <% @people.each do |p| %>
       <tr>
