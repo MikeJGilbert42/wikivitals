@@ -6,6 +6,7 @@ class WikiRecord
     @is_person = false
   end
 
+  #TODO: find a way to before-filter the fetching on a non-AR model
   def person?
     fetch
     @is_person
@@ -26,8 +27,9 @@ class WikiRecord
     @birth_date
   end
 
-  def infobox
-    @infobox
+  def article_title
+    fetch
+    @page_name
   end
 
   def [](key)
@@ -82,7 +84,7 @@ class WikiRecord
     end
 
     #Infer name if not present
-    @infohash[:name] = @page_name.sub('_', ' ') if @infohash[:name].nil?
+    @infohash[:name] = @page_name.gsub('_', ' ') if @infohash[:name].nil?
   end
 
   def fetch

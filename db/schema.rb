@@ -11,13 +11,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120405020335) do
+ActiveRecord::Schema.define(:version => 20120411190302) do
 
   create_table "people", :force => true do |t|
     t.boolean  "alive"
     t.datetime "updated_at"
     t.string   "name"
     t.date     "death_date"
+    t.string   "article_title"
+    t.date     "birth_date"
   end
 
 end

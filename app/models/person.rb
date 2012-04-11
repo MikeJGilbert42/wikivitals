@@ -1,5 +1,5 @@
 class Person < ActiveRecord::Base
-  attr_accessible :name, :death_date, :alive
+  attr_accessible :name, :birth_date, :death_date, :alive, :article_title
 
   def self.get_fields
     accessible_attributes.to_a
@@ -9,9 +9,12 @@ class Person < ActiveRecord::Base
     if !record.person?
       raise "This article is not of a person."
     end
+    record.fetch
     name = record[:name]
+    birth_date = record.birth_date
     death_date = record.death_date
-    Person.create :name => name, :death_date => death_date
+    article_title = record.article_title
+    Person.create :name => name, :birth_date => birth_date, :death_date => death_date, :article_title => article_title, :alive => record.alive?
   end
 
   def alive?

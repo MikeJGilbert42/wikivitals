@@ -7,10 +7,10 @@
 ---Spec disambiguation page for correct exception
 ---Handle redirects (loop fetch when response is #REDIRECT [[destination]])
 ---Add spork support
-Create Person record from WikiRecord (just name for now)
-Migrate new columns for birth and death dates (nils allowed for death date)
-Save birth and death dates into Person record (parse wiki templates for each)
-Determine whether an article is about a person (Albert Einstein case fails)
+---Create Person record from WikiRecord (just name for now)
+---Migrate new columns for birth and death dates (nils allowed for death date)
+---Save birth and death dates into Person record (parse wiki templates for each)
+---Determine whether an article is about a person (Albert Einstein case fails)
 Format query into likely Wikipedia URL
 Add query UI page
 
