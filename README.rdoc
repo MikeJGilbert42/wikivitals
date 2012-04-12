@@ -19,7 +19,7 @@ Difficulty: Regexes on user-generated content.
 Here's an example of what it can do right now from the rails console:
 
        $ albert = WikiRecord.new "Einstein"
-        => #<WikiRecord:0x000000038ada88 @page_name="George_Takei", @infobox=nil, @is_person=false>
+        => #<WikiRecord:0x000000038ada88 @page_name="Einstein", @infobox=nil, @is_person=false>
        $ albert.alive?
         => false 
        albert.article_title
