@@ -13,8 +13,7 @@
 ---Determine whether an article is about a person (Albert Einstein case fails)
 Format query into likely Wikipedia URL
 Add query UI page
-
-+Add storage of person's birth/death dates (migration, row manipulation)
+---Add storage of person's birth/death dates (migration, row manipulation)
 +Process disambiguations in a user-interactive way
 +Factor out non-person disambiguation links before displaying them to the user
 +Create an animated feed of queries
