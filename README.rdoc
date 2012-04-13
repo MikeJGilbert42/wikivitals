@@ -26,3 +26,5 @@ Here's an example of what it can do right now from the rails console:
         => "Albert_Einstein"
        albert.birth_date
         => Fri, 14 Mar 1879
+       $ WikiFetcher.get("Sherlock_Holmes").person?
+        => false 
