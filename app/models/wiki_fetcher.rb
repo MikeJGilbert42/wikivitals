@@ -26,7 +26,7 @@ class WikiFetcher
 
   def self.get_article_body page_name
     uri = URI.parse('http://en.wikipedia.org/w/index.php')
-    params = { 'action' => 'raw', 'title' => "#{wiki_url}" }
+    params = { 'action' => 'raw', 'title' => "#{page_name}" }
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Get.new uri.path
     request.set_form_data params
