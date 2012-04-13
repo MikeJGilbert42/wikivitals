@@ -18,8 +18,8 @@ Difficulty: Regexes on user-generated content.
 
 Here's an example of what it can do right now from the rails console:
 
-       $ albert = WikiRecord.new "Einstein"
-        => #<WikiRecord:0x000000038ada88 @page_name="Einstein", @infobox=nil, @is_person=false>
+       $ albert = WikiFetcher.get "Einstein"
+        =>  => #<WikiRecord:0x0000000494cba0 @page_name="Albert_Einstein", @person_type="scientist\n", ...
        $ albert.alive?
         => false 
        albert.article_title
