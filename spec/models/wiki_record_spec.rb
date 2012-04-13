@@ -1,19 +1,18 @@
 require 'spec_helper'
 
 describe WikiRecord do
-  before do
+  before(:all) do
     class WikiFetcher
-      alias_method :old_wiki_fetch, :wiki_fetch
-      def wiki_fetch(page_name)
-        mock_wiki_fetch(page_name)
+      def self.get_article_body(page_name)
+        mock_get_article_body(page_name)
       end
     end
-    @sam_neill = WikiRecord.new "Sam_Neill"
-    @sam_neil = WikiRecord.new "Sam_Neil"
-    @einstein = WikiRecord.new "Einstein"
-    @sherlock = WikiRecord.new "Sherlock_Holmes"
-    @takei = WikiRecord.new "George_Takei"
-    @elvis = WikiRecord.new "Elvis_Presley"
+    @sam_neill = WikiFetcher.get "Sam_Neill"
+    @sam_neil = WikiFetcher.get "Sam_Neil"
+    @einstein = WikiFetcher.get "Einstein"
+    @sherlock = WikiFetcher.get "Sherlock_Holmes"
+    @takei = WikiFetcher.get "George_Takei"
+    @elvis = WikiFetcher.get "Elvis_Presley"
   end
 
   describe "#person?" do
@@ -36,7 +35,7 @@ describe WikiRecord do
     end
 
     it "works on Archduke Franz Ferdinand" do
-      franz = WikiRecord.new "Archduke_Franz_Ferdinand_of_Austria"
+      franz = WikiFetcher.get "Archduke_Franz_Ferdinand_of_Austria"
       franz.person?.should == true
     end
   end
@@ -57,12 +56,10 @@ describe WikiRecord do
       @sam_neil[:name].should == "Sam Neill"
     end
     it "throws the right exception on disambiguation pages" do
-      david = WikiRecord.new "David_Thomas"
-      lambda { david.alive? }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
+      lambda { WikiFetcher.get "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
     end
     it "repairs redirects when the link is named improperly ([[David Thomas]] instead of [[David_Thomas]])" do
-      dave = WikiRecord.new "David_Thomas"
-      lambda { dave.alive? }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
+      lambda { WikiFetcher.get "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
     end
   end
 end

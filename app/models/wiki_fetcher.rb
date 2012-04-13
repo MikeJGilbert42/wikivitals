@@ -1,15 +1,17 @@
 class WikiFetcher
 
   require 'net/http'
-  include ApplicationHelper
 
-  def initialize(page_name)
-    @page_name = page_name
+  def self.get page_name
+    find_article page_name
   end
 
-  def get_page(follow_redirects = true)
+  private
+
+  def self.find_article(page_name, follow_redirects = true)
     begin
-      body = wiki_fetch repair_link(@page_name)
+      # Why doesn't this have access to application helper's function?
+      body = get_article_body repair_link(page_name)
       redirect_to = nil
       if body =~ /\A\#REDIRECT\s\[\[([^\]]+)\]\]/
         redirect_to = Regexp.last_match[1]
@@ -17,19 +19,12 @@ class WikiFetcher
         #TODO: Handle disambiguation pages.
         raise "You're gonna have to be more specific."
       end
-      @page_name = redirect_to if redirect_to && follow_redirects
+      page_name = redirect_to if redirect_to && follow_redirects
     end while redirect_to && follow_redirects
-    body
+    WikiRecord.new page_name, body
   end
 
-  # For retrieving final article name after redirects, etc.
-  def page_name
-    return @page_name
-  end
-
-  private
-
-  def wiki_fetch wiki_url
+  def self.get_article_body page_name
     uri = URI.parse('http://en.wikipedia.org/w/index.php')
     params = { 'action' => 'raw', 'title' => "#{wiki_url}" }
     http = Net::HTTP.new(uri.host, uri.port)
@@ -41,4 +36,10 @@ class WikiFetcher
     raise "Y U NO GIVE GOOD QUERY: #{response.code}" if response.code != "200"
     response.body
   end
+
+  # Typos have been encountered from time to time.
+  def self.repair_link link
+    link.titlecase.gsub(" ", "_").gsub(/The|And|Of/) { |s| s.downcase }
+  end
+
 end

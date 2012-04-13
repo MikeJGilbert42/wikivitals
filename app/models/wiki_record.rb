@@ -1,39 +1,33 @@
 class WikiRecord
 
-  def initialize(page_name)
+  def initialize(page_name, body)
     @page_name = page_name
-    @infobox = nil
-    @is_person = false
+    raise "Missing page body" if body.nil?
+    parse_info_box body
+    @is_person = has_persondata? body
   end
 
-  #TODO: find a way to before-filter the fetching on a non-AR model
   def person?
-    fetch
     @is_person
   end
 
   def alive?
-    fetch
     @death_date.nil?
   end
 
   def death_date
-    fetch
     @death_date
   end
 
   def birth_date
-    fetch
     @birth_date
   end
 
   def article_title
-    fetch
     @page_name
   end
 
   def [](key)
-    fetch
     instance_variable_get("@infohash")[key]
   end
 
@@ -85,17 +79,5 @@ class WikiRecord
 
     #Infer name if not present
     @infohash[:name] = @page_name.gsub('_', ' ') if @infohash[:name].nil?
-  end
-
-  def fetch
-    return if @fetched
-    fetcher = WikiFetcher.new @page_name
-    page = fetcher.get_page
-    # Store new page name if it changed
-    @page_name = fetcher.page_name
-    raise "Whoops!  Something bad happened and I got no data to show for it" if page.nil?
-    parse_info_box page
-    @is_person = has_persondata? page
-    @fetched = true
   end
 end

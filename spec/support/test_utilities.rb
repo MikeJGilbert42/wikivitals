@@ -1,4 +1,4 @@
-def mock_wiki_fetch page_name
+def mock_get_article_body page_name
   file_name = "#{page_name}.raw"
   body = nil
   begin

@@ -11,8 +11,12 @@
 ---Migrate new columns for birth and death dates (nils allowed for death date)
 ---Save birth and death dates into Person record (parse wiki templates for each)
 ---Determine whether an article is about a person (Albert Einstein case fails)
+---Refactor WikiFetcher to return a WikiRecord; eliminate need for WikiFetcher instance
+Add expiration time to Person
+Spec Person#valid? to test expiration time
+
+Add query UI page (to new controller?)
 Format query into likely Wikipedia URL
-Add query UI page
 ---Add storage of person's birth/death dates (migration, row manipulation)
 +Process disambiguations in a user-interactive way
 +Factor out non-person disambiguation links before displaying them to the user
