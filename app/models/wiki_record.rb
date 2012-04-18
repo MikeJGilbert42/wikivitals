@@ -32,7 +32,7 @@ class WikiRecord
   end
 
   def parse_date_template input
-    # All we care about is the first three decimals in succession
+    # All we care about is the first three integers in succession, delimited by pipes
     input =~ /\{\{.*?(\d+)\|(\d+)\|(\d+).*}\}/
     Date.parse Regexp.last_match[1..3].reverse.join("-")
   end
@@ -43,7 +43,7 @@ class WikiRecord
   end
 
   def extract_infobox body
-    start_index = body =~ /\{\{Infobox\s+([\w\s]+)/
+    start_index = body =~ /\{\{Infobox\s+([\w ]+)/
     raise "Infobox was not found!" if !(start_index)
     @person_type = Regexp.last_match(1)
     open = 0
