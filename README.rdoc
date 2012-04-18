@@ -19,7 +19,7 @@ Difficulty: Regexes on user-generated content.
 Here's an example of what it can do right now from the rails console:
 
        $ albert = WikiFetcher.get "Einstein"
-        =>  => #<WikiRecord:0x0000000494cba0 @page_name="Albert_Einstein", @person_type="scientist\n", ...
+        => #<WikiRecord:0x0000000494cba0 @page_name="Albert_Einstein", @person_type="scientist\n", ...
        $ albert.alive?
         => false 
        albert.article_title
