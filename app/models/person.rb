@@ -9,7 +9,6 @@ class Person < ActiveRecord::Base
     if !record.person?
       raise "This article is not of a person."
     end
-    record.fetch
     name = record[:name]
     birth_date = record.birth_date
     death_date = record.death_date
