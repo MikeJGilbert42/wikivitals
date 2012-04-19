@@ -6,6 +6,12 @@ class WikiFetcher
     find_article page_name
   end
 
+  # Typos have been encountered from time to time.
+  # TODO: Move to helper.
+  def self.repair_link link
+    link.titlecase.gsub(" ", "_").gsub(/The|And|Of/) { |s| s.downcase }
+  end
+
   private
 
   def self.find_article(page_name, follow_redirects = true)
@@ -36,10 +42,4 @@ class WikiFetcher
     raise "Y U NO GIVE GOOD QUERY: #{response.code}" if response.code != "200"
     response.body
   end
-
-  # Typos have been encountered from time to time.
-  def self.repair_link link
-    link.titlecase.gsub(" ", "_").gsub(/The|And|Of/) { |s| s.downcase }
-  end
-
 end
