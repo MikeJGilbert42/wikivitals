@@ -5,7 +5,36 @@ body {
    font-family: arial;
 }
 
+.page-name {
+   text-align: center;
+   a:link    { color: black; text-decoration: none; }
+   a:hover   { color: blue; text-decoration: underline; }
+   a:visited { color: black; text-decoration: none; }
+   a:active  { color: black; text-decoration: none; }
+}
+
+h2 {
+   text-align: center;
+}
+
+p {
+   text-align: center;
+}
+
 table {
    width: 70%;
    text-align: left;
+}
+
+.person-name {
+   text-align: center;
+}
+
+.person-status {
+   text-align: center;
+   font-size: 72pt;
+}
+
+.people-search {
+   text-align: center;
 }

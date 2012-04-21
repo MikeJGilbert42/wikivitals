@@ -17,9 +17,17 @@ class Person < ActiveRecord::Base
   end
 
   # Look up person from table based on assumed article name, and consult Wikipedia if no entry found
-  def self.get_person article
-    person = Person.where(:article_title => article).first
-    person = new_from_wiki_record WikiFetcher.get article if person.nil?
+  def self.get_person article_title
+    person = Person.where(:article_title => article_title).first
+    if person.nil?
+      begin
+        article = WikiFetcher.get article_title
+        person = new_from_wiki_record article
+      rescue
+        raise "Problem getting or processing the article"
+      end
+    end
+    person
   end
 
 end

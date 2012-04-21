@@ -1,0 +1,4 @@
+<h1 class="person-name"><%= @person.name %></h1>
+<h2 class="person-status"><% if @person.alive? %>ALIVE<% else %>DEAD<% end %></h2>
+
+<%= render :partial => 'search_form' %>
