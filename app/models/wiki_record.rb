@@ -34,7 +34,12 @@ class WikiRecord
   def parse_date_template input
     # All we care about is the first three integers in succession, delimited by pipes
     input =~ /\{\{.*?(\d+)\|(\d+)\|(\d+).*}\}/
-    Date.parse Regexp.last_match[1..3].reverse.join("-")
+    if Regexp.last_match.nil? || Regexp.last_match.length < 3
+      # Check for a plain text date (see Alexander Hamilton)
+      Date.parse input.gsub(/\([^\)]*\)/, "")
+    else
+      Date.parse Regexp.last_match[1..3].reverse.join("-")
+    end
   end
 
   def has_persondata? body

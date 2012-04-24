@@ -38,6 +38,11 @@ describe WikiRecord do
       franz = WikiFetcher.get "Archduke_Franz_Ferdinand_of_Austria"
       franz.person?.should == true
     end
+
+    it "works on Alexander Hamilton" do
+      alex = WikiFetcher.get "Alexander_Hamilton"
+      alex.person?.should == true
+    end
   end
 
   describe "#alive?" do
