@@ -1,4 +1,7 @@
 class PeopleController < ApplicationController
+  rescue_from ArticleNotFound, :with => :render_article_not_found
+  rescue_from ArticleNotPerson, :with => :render_not_person
+
   def index
     @fields = Person.get_fields
     @people = Person.all :select => @fields
@@ -20,4 +23,35 @@ class PeopleController < ApplicationController
   def disambiguate
     #TODO: The user will need to choose between various Person results here.
   end
+
+  def not_person
+  end
+
+  def article_not_found
+  end
+
+  unless Rails.application.config.consider_all_requests_local
+#    rescue_from Exception, with: :render_500
+    rescue_from ArticleNotFound with: :render_unknown
+    rescue_from ArticleNotPerson with: :render_not_person
+  end
+
+  private
+
+  def render_article_not_found(exception)
+    @error_message = exception.message
+    respond_to do |format|
+      format.html { render 'people/article_not_found' }
+      format.all { render nothing: true }
+    end
+  end
+
+  def render_not_person(exception)
+    @error_message = exception.message
+    respond_to do |format|
+      format.html { render 'people/not_person' }
+      format.all { render nothing: true }
+    end
+  end
+
 end

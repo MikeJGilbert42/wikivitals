@@ -7,7 +7,7 @@ class Person < ActiveRecord::Base
 
   def self.new_from_wiki_record record
     if !record.person?
-      raise ArticleNotPerson "Not a person"
+      raise Exceptions::ArticleNotPerson.new "Not a person"
     end
     name = record[:name]
     birth_date = record.birth_date

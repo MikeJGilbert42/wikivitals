@@ -10,5 +10,9 @@ describe Person do
     it "handles 404 errors" do
       lambda { Person.find_person("Fsjal") }.should raise_error(ArticleNotFound)
     end
+
+    it "rejects non-people" do
+      lambda { Person.find_person("Sherlock Holmes") }.should raise_error(ArticleNotPerson)
+    end
   end
 end
