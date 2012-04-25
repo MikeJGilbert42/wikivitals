@@ -4,7 +4,6 @@ describe WikiRecord do
   before(:all) do
     mock_wiki_fetcher
     @sam_neill = WikiFetcher.get "Sam_Neill"
-    @sam_neil = WikiFetcher.get "Sam_Neil"
     @einstein = WikiFetcher.get "Einstein"
     @sherlock = WikiFetcher.get "Sherlock_Holmes"
     @takei = WikiFetcher.get "George_Takei"
@@ -54,7 +53,12 @@ describe WikiRecord do
   describe "#fetch" do
     it "handles redirects" do
       @einstein[:name].should == "Albert Einstein"
-      @sam_neil[:name].should == "Sam Neill"
+      sam_neil = WikiFetcher.get "Sam_Neil"
+      sam_neil[:name].should == "Sam Neill"
+    end
+    it "handles Abe Lincoln's redirect" do
+      abe = WikiFetcher.get "Abe_Lincoln"
+      abe[:name].should == "Abraham Lincoln"
     end
     it "throws the right exception on disambiguation pages" do
       lambda { WikiFetcher.get "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
