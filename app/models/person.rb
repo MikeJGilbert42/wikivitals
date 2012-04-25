@@ -7,7 +7,7 @@ class Person < ActiveRecord::Base
 
   def self.new_from_wiki_record record
     if !record.person?
-      raise "This article is not of a person."
+      raise ArticleNotPerson "Not a person"
     end
     name = record[:name]
     birth_date = record.birth_date
@@ -17,14 +17,14 @@ class Person < ActiveRecord::Base
   end
 
   # Look up person from table based on assumed article name, and consult Wikipedia if no entry found
-  def self.get_person article_title
+  def self.find_person article_title
     person = Person.where(:article_title => article_title).first
     if person.nil?
       begin
         article = WikiFetcher.get article_title
         person = new_from_wiki_record article
-      rescue
-        raise "Problem getting or processing the article"
+      rescue Exceptions::ArticleNotFound => e
+        raise e
       end
     end
     person

@@ -3,8 +3,8 @@ class WikiRecord
   def initialize(page_name, body)
     @page_name = page_name
     raise "Missing page body" if body.nil?
-    parse_info_box body
     @is_person = has_persondata? body
+    parse_info_box body if person?
   end
 
   def person?
@@ -12,6 +12,7 @@ class WikiRecord
   end
 
   def alive?
+    false if !person?
     @death_date.nil?
   end
 
@@ -30,6 +31,8 @@ class WikiRecord
   def [](key)
     instance_variable_get("@infohash")[key]
   end
+
+  private
 
   def parse_date_template input
     # All we care about is the first three integers in succession, delimited by pipes

@@ -7,7 +7,7 @@ class PeopleController < ApplicationController
   def search
     if params[:q]
       article_name = WikiFetcher.repair_link params[:q]
-      @person = Person.get_person article_name
+      @person = Person.find_person article_name
       render :show
       return
     end

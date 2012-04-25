@@ -39,7 +39,7 @@ class WikiFetcher
     request = Net::HTTP::Get.new uri.path + '?' + request.body
     response = http.request request
     #puts response
-    raise "Y U NO GIVE GOOD QUERY: #{response.code}" if response.code != "200"
+    raise ArticleNotFound "Article #{page_name} not found" if response.code == "404"
     response.body
   end
 end

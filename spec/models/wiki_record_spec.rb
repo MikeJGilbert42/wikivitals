@@ -2,11 +2,7 @@ require 'spec_helper'
 
 describe WikiRecord do
   before(:all) do
-    class WikiFetcher
-      def self.get_article_body(page_name)
-        mock_get_article_body(page_name)
-      end
-    end
+    mock_wiki_fetcher
     @sam_neill = WikiFetcher.get "Sam_Neill"
     @sam_neil = WikiFetcher.get "Sam_Neil"
     @einstein = WikiFetcher.get "Einstein"
