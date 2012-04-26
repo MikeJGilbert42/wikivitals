@@ -24,18 +24,6 @@ class PeopleController < ApplicationController
     #TODO: The user will need to choose between various Person results here.
   end
 
-  def not_person
-  end
-
-  def article_not_found
-  end
-
-  unless Rails.application.config.consider_all_requests_local
-#    rescue_from Exception, with: :render_500
-    rescue_from ArticleNotFound with: :render_unknown
-    rescue_from ArticleNotPerson with: :render_not_person
-  end
-
   private
 
   def render_article_not_found(exception)

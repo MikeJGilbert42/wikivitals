@@ -34,4 +34,8 @@ Wikivitals::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
+  config.after_initialize do
+    Net::HTTP.enable_debug!
+  end
 end
