@@ -2,11 +2,6 @@ class PeopleController < ApplicationController
   rescue_from ArticleNotFound, :with => :render_article_not_found
   rescue_from ArticleNotPerson, :with => :render_not_person
 
-  def index
-    @fields = Person.get_fields
-    @people = Person.all :select => @fields
-  end
-
   def search
     if params[:q]
       article_name = WikiFetcher.repair_link params[:q]
