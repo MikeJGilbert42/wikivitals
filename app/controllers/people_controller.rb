@@ -1,10 +1,12 @@
 class PeopleController < ApplicationController
+  include WikiHelper
+
   rescue_from ArticleNotFound, :with => :render_article_not_found
   rescue_from ArticleNotPerson, :with => :render_not_person
 
   def search
     if params[:q]
-      article_name = WikiFetcher.repair_link params[:q]
+      article_name = WikiHelper::repair_link params[:q]
       @person = Person.find_person article_name
       render :show
       return

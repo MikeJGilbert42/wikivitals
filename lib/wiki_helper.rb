@@ -1,6 +1,10 @@
 module WikiHelper
-  # Typos have been encountered from time to time.
+  # Repair common mistakes found in case and formatting.
   def self.repair_link link
-    link.titlecase.gsub(" ", "_").gsub(/The|And|Of/) { |s| s.downcase }
+    # Capitalize all words except of, the, and, excluding words inside parentheses
+    link =~ /([^\(]*)(\([^\)]*\))?/
+    name, parenthetical = Regexp.last_match[1..2]
+    name = name.titlecase.gsub(/The|And|Of/) { |s| s.downcase }
+    name.concat(parenthetical || "").gsub(" ", "_")
   end
 end
