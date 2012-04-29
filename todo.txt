@@ -1,9 +1,7 @@
-Add specs to Person and PeopleController
-Enforce uniqueness on article name
----Fix Alexander Hamilton case
+Fix direct attempts at querying a specific disambiguated person (i.e., articles like Jack_White_(musician))
+Enforce Person uniqueness on article name
 Add expiration time to Person
 Spec Person#valid? to test expiration time
-Relocate URL helper
 +Process disambiguations in a user-interactive way
 +Factor out non-person disambiguation links before displaying them to the user
 +Create an animated feed of queries

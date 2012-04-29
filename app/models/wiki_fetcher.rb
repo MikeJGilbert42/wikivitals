@@ -1,15 +1,9 @@
 class WikiFetcher
-
+  include WikiHelper
   require 'net/http'
 
   def self.get page_name
     find_article page_name
-  end
-
-  # Typos have been encountered from time to time.
-  # TODO: Move to helper.
-  def self.repair_link link
-    link.titlecase.gsub(" ", "_").gsub(/The|And|Of/) { |s| s.downcase }
   end
 
   private
@@ -17,7 +11,7 @@ class WikiFetcher
   def self.find_article(page_name, follow_redirects = true)
     begin
       # Why doesn't this have access to application helper's function?
-      body = get_article_body repair_link(page_name)
+      body = get_article_body WikiHelper::repair_link(page_name)
       redirect_to = nil
       if body =~ /\A\#REDIRECT\s\[\[([^\]]+)\]\]/i
         redirect_to = Regexp.last_match[1]
