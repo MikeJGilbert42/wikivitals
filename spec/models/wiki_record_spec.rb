@@ -48,6 +48,11 @@ describe WikiRecord do
     it "shows Elvis as being dead" do
       @elvis.alive?.should == false
     end
+
+    it "handles Joe Dean being alive even though he has no infobox" do
+      joe = WikiFetcher.get "Joe_Dean"
+      joe.alive?.should == true
+    end
   end
 
   describe "#fetch" do

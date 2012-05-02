@@ -13,7 +13,7 @@ class WikiRecord
 
   def alive?
     false if !person?
-    @death_date.nil?
+    @alive_category || !@dead_category || @infobox && @death_date.nil?
   end
 
   def death_date
@@ -46,13 +46,12 @@ class WikiRecord
   end
 
   def has_persondata? body
-    body =~ /\{\{Persondata[^\}]*\}\}/
-    !Regexp.last_match.nil?
+    !(body.index(/\{\{Persondata[^\}]*\}\}/).nil?)
   end
 
   def extract_infobox body
     start_index = body =~ /\{\{Infobox\s+([\w ]+)/
-    raise "Infobox was not found!" if !(start_index)
+    return nil if !(start_index)
     @person_type = Regexp.last_match(1)
     open = 0
     end_index = 0
@@ -69,23 +68,27 @@ class WikiRecord
 
   def parse_info_box body
     #All the data extraction goes here.
-    @infobox = extract_infobox body
-    @infobox =~ /\{\{Infobox\s([\w ]+)/
-
-    data = @infobox.scan(/^\|\s?(.*)$/).flatten.map { |s| s.split(/\s*=\s*/, 2) } #[["x","y"], ["z", ""], ...]
     @infohash = {}
-    data.collect do |x|
-      next if x[0].nil?
-      @infohash[x[0].to_sym] = x[1] == "" ? nil : x[1]
-    end
-    if (@infohash[:death_date])
-      @death_date = parse_date_template @infohash[:death_date]
-    end
-    if (@infohash[:birth_date])
-      @birth_date = parse_date_template @infohash[:birth_date]
+    @infobox = extract_infobox body
+    if @infobox
+      @infobox =~ /\{\{Infobox\s([\w ]+)/
+
+      data = @infobox.scan(/^\|\s?(.*)$/).flatten.map { |s| s.split(/\s*=\s*/, 2) } #[["x","y"], ["z", ""], ...]
+      data.collect do |x|
+        next if x[0].nil?
+        @infohash[x[0].to_sym] = x[1] == "" ? nil : x[1]
+      end
+      if (@infohash[:death_date])
+        @death_date = parse_date_template @infohash[:death_date]
+      end
+      if (@infohash[:birth_date])
+        @birth_date = parse_date_template @infohash[:birth_date]
+      end
     end
 
     #Infer name if not present
     @infohash[:name] = @page_name.gsub('_', ' ') if @infohash[:name].nil?
+    @alive_category = !(body.index(/Category:Living people/).nil?)
+    @dead_category = !(body.index(/Category:\d+ deaths/).nil?)
   end
 end
