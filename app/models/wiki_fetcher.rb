@@ -11,7 +11,8 @@ class WikiFetcher
   def self.find_article(page_name, follow_redirects = true)
     begin
       # Why doesn't this have access to application helper's function?
-      body = get_article_body WikiHelper::repair_link(page_name)
+      page_name = WikiHelper::repair_link(page_name)
+      body = get_article_body page_name
       redirect_to = nil
       if body =~ /\A\#REDIRECT\s\[\[([^\]]+)\]\]/i
         redirect_to = Regexp.last_match[1]

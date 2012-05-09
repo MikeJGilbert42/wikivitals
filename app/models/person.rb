@@ -12,6 +12,7 @@ class Person < ActiveRecord::Base
 
   # Look up person from table based on assumed article name, and consult Wikipedia if no entry found
   def self.find_person article_title
+    article_title = WikiHelper::repair_link article_title
     person = Person.where(:article_title => article_title).first
     if person.nil?
       begin

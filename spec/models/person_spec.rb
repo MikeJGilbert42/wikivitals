@@ -14,5 +14,12 @@ describe Person do
     it "rejects non-people" do
       lambda { Person.find_person("Sherlock Holmes") }.should raise_error(ArticleNotPerson)
     end
+
+    it "uses the redirected article title" do
+      barak = Person.find_person("Barack Obama")
+      barak.article_title.should == "Barack_Obama"
+      abe = Person.find_person("Abe_Lincoln")
+      abe.article_title.should == "Abraham_Lincoln"
+    end
   end
 end
