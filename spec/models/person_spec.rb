@@ -21,5 +21,18 @@ describe Person do
       abe = Person.find_person("Abe_Lincoln")
       abe.article_title.should == "Abraham_Lincoln"
     end
+
+    it "is unique on article title (redirect second)" do
+      Person.find_person("Sam_Neill")
+      Person.find_person("Sam_Neil")
+      Person.count.should == 1
+    end
+
+    it "is unique on article title (redirect first)" do
+      Person.find_person("Sam_Neil")
+      Person.find_person("Sam_Neill")
+      Person.count.should == 1
+    end
+
   end
 end

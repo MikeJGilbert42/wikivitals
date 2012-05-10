@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120411190302) do
+ActiveRecord::Schema.define(:version => 20120509021037) do
 
   create_table "people", :force => true do |t|
     t.boolean  "alive"
@@ -21,5 +21,7 @@ ActiveRecord::Schema.define(:version => 20120411190302) do
     t.string   "article_title"
     t.date     "birth_date"
   end
+
+  add_index "people", ["article_title"], :name => "index_people_on_article_title", :unique => true
 
 end

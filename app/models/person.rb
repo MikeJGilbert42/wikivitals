@@ -1,4 +1,6 @@
 class Person < ActiveRecord::Base
+  validates_uniqueness_of :article_title
+
   def self.new_from_wiki_record record
     if !record.person?
       raise Exceptions::ArticleNotPerson.new "Not a person"
