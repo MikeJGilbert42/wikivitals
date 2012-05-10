@@ -40,6 +40,15 @@ describe WikiRecord do
     end
   end
 
+  describe "#birth_date" do
+    it "parses birth dates correctly" do
+      @takei.birth_date.should == Date.parse("20/4/1937")
+      @elvis.birth_date.should == Date.parse("8/1/1935")
+      @sam_neill.birth_date.should == Date.parse("14/9/1947")
+      @einstein.birth_date.should == Date.parse("14/3/1879")
+    end
+  end
+
   describe "#alive?" do
     it "shows George Takei as being alive" do
       @takei.alive?.should == true
