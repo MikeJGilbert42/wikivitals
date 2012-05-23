@@ -26,7 +26,7 @@ class PeopleController < ApplicationController
   def render_article_not_found(exception)
     @error_message = exception.message
     respond_to do |format|
-      format.html { render 'people/article_not_found' }
+      format.html { render 'article_not_found' }
       format.all { render nothing: true }
     end
   end
@@ -34,7 +34,7 @@ class PeopleController < ApplicationController
   def render_not_person(exception)
     @error_message = exception.message
     respond_to do |format|
-      format.html { render 'people/not_person' }
+      format.html { render 'not_person' }
       format.all { render nothing: true }
     end
   end
