@@ -9,6 +9,7 @@ data relationship modeling, performance optimization, AJAX forms, and jQuery UI.
 == Features
 
 * Fetches raw Wikipedia Templates for article names and parses to determine vitals, personhood
+* Attempts to translate entered queries into likely article names
 * Follows article redirects
 * Saves Wikipedia articles in database to prevent over-fetching
 
@@ -19,10 +20,16 @@ data relationship modeling, performance optimization, AJAX forms, and jQuery UI.
 
 == Usage
 
-Here's an example of what it can do right now from the rails console:
+Here's an example of what it can do right now from the rails console (with some illustrative excerpts of debug output):
 
-       $ albert = WikiFetcher.get "Einstein"
-        => #<WikiRecord:0x0000000494cba0 @page_name="Albert_Einstein", @person_type="scientist\n", ...
+       $ albert = Person.find_article("Einstein")
+       opening connection to en.wikipedia.org...
+       opened
+       <- "GET /w/index.php?action=raw&title=Einstein...
+       -> "#REDIRECT [[Albert_Einstein]] {{R_from_surname}}"
+       <- "GET /w/index.php?action=raw&title=Albert_Einstein
+       -> "{{Infobox scientist\n| name = Albert Einstein\n...
+       => #<Person id: 65, alive: false, updated_at: "2012-07-11 18:13:40", name: "Albert Einstein", ...
        $ albert.alive?
         => false 
        albert.article_title
@@ -30,4 +37,4 @@ Here's an example of what it can do right now from the rails console:
        albert.birth_date
         => Fri, 14 Mar 1879
        $ WikiFetcher.get("Sherlock_Holmes").person?
-        => false 
+        => false
