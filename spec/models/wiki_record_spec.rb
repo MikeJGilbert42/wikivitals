@@ -81,4 +81,12 @@ describe WikiRecord do
       lambda { WikiFetcher.get "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
     end
   end
+
+  describe "#find", :focus => true do
+    it "should only fetch the Wikipedia article once" do
+      WikiFetcher.get "Alexander_Hamilton"
+      WikiFetcher.should_receive(:get_article_body).exactly(0).times
+      WikiFetcher.get "Alexander_Hamilton"
+    end
+  end
 end

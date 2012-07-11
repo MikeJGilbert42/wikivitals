@@ -3,7 +3,11 @@ class WikiFetcher
   require 'net/http'
 
   def self.get page_name
-    find_article page_name
+    if (found = WikiRecord.where(:article_title => page_name).first)
+      found
+    else
+      find_article page_name
+    end
   end
 
   private
@@ -22,7 +26,7 @@ class WikiFetcher
       end
       page_name = redirect_to if redirect_to && follow_redirects
     end while redirect_to && follow_redirects
-    WikiRecord.new :article_title => page_name, :article_body => body
+    WikiRecord.create :article_title => page_name, :article_body => body
   end
 
   def self.get_article_body page_name
@@ -35,6 +39,6 @@ class WikiFetcher
     response = http.request request
     #puts response
     raise Exceptions::ArticleNotFound.new "Article #{page_name} not found" if response.code == "404"
-    response.body
+    response.body.force_encoding('utf-8')
   end
 end

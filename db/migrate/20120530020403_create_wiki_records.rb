@@ -6,5 +6,6 @@ class CreateWikiRecords < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :wiki_records, :article_title, :unique => true
   end
 end
