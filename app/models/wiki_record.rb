@@ -1,10 +1,10 @@
-class WikiRecord
+class WikiRecord < ActiveRecord::Base
 
-  def initialize(page_name, body)
-    @page_name = page_name
-    raise "Missing page body" if body.nil?
-    @is_person = has_persondata? body
-    parse_info_box body if person?
+  after_initialize :read_article
+
+  def read_article
+    @is_person = has_persondata? article_body
+    parse_info_box article_body if person?
   end
 
   def person?
@@ -22,10 +22,6 @@ class WikiRecord
 
   def birth_date
     @birth_date
-  end
-
-  def article_title
-    @page_name
   end
 
   def [](key)
@@ -87,7 +83,7 @@ class WikiRecord
     end
 
     #Infer name if not present
-    @infohash[:name] = @page_name.gsub('_', ' ') if @infohash[:name].nil?
+    @infohash[:name] = article_title.gsub('_', ' ') if @infohash[:name].nil?
     @alive_category = !(body.index(/Category:Living people/).nil?)
     @dead_category = !(body.index(/Category:\d+ deaths/).nil?)
   end

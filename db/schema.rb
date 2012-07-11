@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120509021037) do
+ActiveRecord::Schema.define(:version => 20120530020403) do
 
   create_table "people", :force => true do |t|
     t.boolean  "alive"
@@ -23,5 +23,12 @@ ActiveRecord::Schema.define(:version => 20120509021037) do
   end
 
   add_index "people", ["article_title"], :name => "index_people_on_article_title", :unique => true
+
+  create_table "wiki_records", :force => true do |t|
+    t.string   "article_title"
+    t.string   "article_body"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
 
 end

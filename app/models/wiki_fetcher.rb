@@ -22,7 +22,7 @@ class WikiFetcher
       end
       page_name = redirect_to if redirect_to && follow_redirects
     end while redirect_to && follow_redirects
-    WikiRecord.new page_name, body
+    WikiRecord.new :article_title => page_name, :article_body => body
   end
 
   def self.get_article_body page_name
