@@ -12,7 +12,7 @@ class Person < ActiveRecord::Base
     Person.create :name => name, :birth_date => birth_date, :death_date => death_date, :article_title => article_title, :alive => record.alive?
   end
 
-  # Look up person from table based on assumed article name, and consult Wikipedia if no entry found
+  # Look up person from table based on assumed article name, and consult WikiRecord if no entry found
   def self.find_person article_title
     article_title = WikiHelper::repair_link article_title
     person = Person.where(:article_title => article_title).first

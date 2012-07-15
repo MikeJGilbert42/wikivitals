@@ -5,7 +5,7 @@ class PeopleController < ApplicationController
   rescue_from ArticleNotPerson, :with => :render_not_person
 
   def search
-    if params[:q]
+    if params[:q] && !params[:q].blank?
       article_name = WikiHelper::repair_link params[:q]
       @person = Person.find_person article_name
       render :show

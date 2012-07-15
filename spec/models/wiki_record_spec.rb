@@ -82,7 +82,7 @@ describe WikiRecord do
     end
   end
 
-  describe "#find", :focus => true do
+  describe "#find" do
     it "should only fetch the Wikipedia article once" do
       WikiFetcher.get "Alexander_Hamilton"
       WikiFetcher.should_receive(:get_article_body).exactly(0).times

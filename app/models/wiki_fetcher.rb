@@ -14,7 +14,6 @@ class WikiFetcher
 
   def self.find_article(page_name, follow_redirects = true)
     begin
-      # Why doesn't this have access to application helper's function?
       page_name = WikiHelper::repair_link(page_name)
       body = get_article_body page_name
       redirect_to = nil
