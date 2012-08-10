@@ -1,10 +1,19 @@
 class WikiRecord < ActiveRecord::Base
 
   after_initialize :read_article
+  belongs_to :redirect, :class_name => "WikiRecord"
 
   def read_article
-    @is_person = has_persondata? article_body
-    parse_info_box article_body if person?
+    if article_body =~ /\A\#REDIRECT\s\[\[([^\]]+)\]\]/i
+      @redirect_title = Regexp.last_match[1]
+    else
+      @is_person = has_persondata? article_body
+      parse_info_box article_body if person?
+    end
+  end
+
+  def redirect_title
+    @redirect_title
   end
 
   def person?
@@ -24,7 +33,7 @@ class WikiRecord < ActiveRecord::Base
     @birth_date
   end
 
-  def [](key)
+  def infohash(key)
     instance_variable_get("@infohash")[key]
   end
 

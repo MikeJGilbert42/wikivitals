@@ -10,6 +10,17 @@ describe WikiRecord do
     @elvis = WikiFetcher.get "Elvis_Presley"
   end
 
+  describe "#redirect" do
+    it "has an activerecord redirect association" do
+      WikiRecord.any_instance.stub(:read_article).and_return nil
+      source = WikiRecord.create :article_title => "Source", :article_body => nil
+      destination = WikiRecord.create :article_title => "Destination", :article_body => nil
+      source.redirect = destination
+      source.save!
+      WikiRecord.where(:article_title => "Source").first.redirect.article_title.should == "Destination"
+    end
+  end
+
   describe "#person?" do
     it "works on people of type person" do
       @sam_neill.should_not == nil
@@ -66,13 +77,16 @@ describe WikiRecord do
 
   describe "#fetch" do
     it "handles redirects" do
-      @einstein[:name].should == "Albert Einstein"
+      @einstein.infohash(:name).should == "Albert Einstein"
       sam_neil = WikiFetcher.get "Sam_Neil"
-      sam_neil[:name].should == "Sam Neill"
+      sam_neil.infohash(:name).should == "Sam Neill"
     end
     it "handles Abe Lincoln's redirect" do
-      abe = WikiFetcher.get "Abe_Lincoln"
-      abe[:name].should == "Abraham Lincoln"
+      abraham = WikiFetcher.get "Abe_Lincoln"
+      abraham.infohash(:name).should == "Abraham Lincoln"
+      abe = WikiRecord.where(:article_title => "Abe_Lincoln").first
+      abe.should be
+      abe.redirect.should == abraham
     end
     it "throws the right exception on disambiguation pages" do
       lambda { WikiFetcher.get "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")

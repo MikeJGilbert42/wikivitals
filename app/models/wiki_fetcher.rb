@@ -2,30 +2,42 @@ class WikiFetcher
   include WikiHelper
   require 'net/http'
 
-  def self.get page_name
-    if (found = WikiRecord.where(:article_title => page_name).first)
-      found
-    else
-      find_article page_name
-    end
+  def self.get page_name, follow_redirects = true
+    found = nil
+    begin
+      source_page = found
+      found = find_article page_name
+      if found
+        # Set up the permanent redirect here
+        source_page.update_attributes(:redirect => found) if source_page
+        page_name = found.redirect_title if found.redirect_title
+      end
+    end while follow_redirects && found && found.redirect_title
+    found
   end
 
   private
 
-  def self.find_article(page_name, follow_redirects = true)
+  def self.find_article page_name
+    record = nil
+    page_name = WikiHelper::repair_link(page_name)
+    if (record = WikiRecord.where(:article_title => page_name).first)
+      # Follow permanent redirects
+      record = record.redirect while record.redirect
+      return record
+    end
+    body = get_article_body page_name
+    if body.include? "may refer to"
+      #TODO: Handle disambiguation pages.
+      raise "You're gonna have to be more specific."
+    end
     begin
-      page_name = WikiHelper::repair_link(page_name)
-      body = get_article_body page_name
-      redirect_to = nil
-      if body =~ /\A\#REDIRECT\s\[\[([^\]]+)\]\]/i
-        redirect_to = Regexp.last_match[1]
-      elsif body.include? "may refer to"
-        #TODO: Handle disambiguation pages.
-        raise "You're gonna have to be more specific."
-      end
-      page_name = redirect_to if redirect_to && follow_redirects
-    end while redirect_to && follow_redirects
-    WikiRecord.create :article_title => page_name, :article_body => body
+      record = WikiRecord.create :article_title => page_name, :article_body => body
+    rescue ActiveRecord::StatementInvalid => e
+      # This shouldn't happen because of the 'where' executed above, but just in case...
+      return nil
+    end
+    record
   end
 
   def self.get_article_body page_name

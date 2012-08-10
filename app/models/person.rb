@@ -5,7 +5,7 @@ class Person < ActiveRecord::Base
     if !record.person?
       raise Exceptions::ArticleNotPerson.new "Not a person"
     end
-    name = record[:name]
+    name = record.infohash(:name)
     birth_date = record.birth_date
     death_date = record.death_date
     article_title = record.article_title

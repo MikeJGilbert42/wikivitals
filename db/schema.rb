@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120530020403) do
+ActiveRecord::Schema.define(:version => 20120809224946) do
 
   create_table "people", :force => true do |t|
     t.boolean  "alive"
@@ -29,8 +29,7 @@ ActiveRecord::Schema.define(:version => 20120530020403) do
     t.string   "article_body"
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
+    t.integer  "redirect_id"
   end
-
-  add_index "wiki_records", ["article_title"], :name => "index_wiki_records_on_article_title", :unique => true
 
 end
