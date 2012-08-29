@@ -1,6 +1,7 @@
 module WikiHelper
   # Repair common mistakes found in case and formatting.
   def self.repair_link link
+    return nil if link.nil?
     # Capitalize all words except of, the, and, excluding words inside parentheses
     link =~ /([^\(]*)(\([^\)]*\))?/
     name, parenthetical = Regexp.last_match[1..2]

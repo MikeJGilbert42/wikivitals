@@ -23,19 +23,25 @@ class WikiFetcher
     page_name = WikiHelper::repair_link(page_name)
     if (record = WikiRecord.where(:article_title => page_name).first)
       # Follow permanent redirects
-      record = record.redirect while record.redirect
-      return record
+      record = record.redirect while record.fetched? && record.redirect
     end
-    body = get_article_body page_name
-    if body.include? "may refer to"
-      #TODO: Handle disambiguation pages.
-      raise "You're gonna have to be more specific."
-    end
-    begin
-      record = WikiRecord.create :article_title => page_name, :article_body => body
-    rescue ActiveRecord::StatementInvalid => e
-      # This shouldn't happen because of the 'where' executed above, but just in case...
-      return nil
+    if record && record.fetched?
+      body = record.article_body
+    else
+      body = get_article_body page_name
+      if body.include? "may refer to"
+        #TODO: Handle disambiguation pages.
+        raise "You're gonna have to be more specific."
+      end
+      begin
+        record = WikiRecord.new if !record
+        record.article_title = page_name
+        record.article_body = body
+        record.save!
+      rescue ActiveRecord::StatementInvalid => e
+        # This shouldn't happen because of the 'where' executed above, but just in case...
+        return nil
+      end
     end
     record
   end

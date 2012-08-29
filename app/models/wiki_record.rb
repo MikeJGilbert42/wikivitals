@@ -1,43 +1,66 @@
 class WikiRecord < ActiveRecord::Base
 
-  after_initialize :read_article
+  after_initialize :read_article, :if => :fetched?
   belongs_to :redirect, :class_name => "WikiRecord"
 
-  def read_article
-    if article_body =~ /\A\#REDIRECT\s\[\[([^\]]+)\]\]/i
-      @redirect_title = Regexp.last_match[1]
-    else
-      @is_person = has_persondata? article_body
-      parse_info_box article_body if person?
-    end
+  has_many :links
+  has_many :targets, :through => :links
+
+  def article_body= body
+    write_attribute(:article_body, body)
+    read_article if body
+  end
+
+  def fetched?
+    !!article_body
   end
 
   def redirect_title
-    @redirect_title
+    check_fetched
+    @redirect_title ||= WikiHelper::repair_link((/\A\#REDIRECT\s\[\[([^\]]+)\]\]/i.match(article_body) || [])[1])
   end
 
   def person?
-    @is_person
+    check_fetched
+    @is_person ||= has_persondata? article_body
   end
 
   def alive?
+    check_fetched
     false if !person?
     @alive_category || !@dead_category || @infobox && @death_date.nil?
   end
 
   def death_date
+    check_fetched
     @death_date
   end
 
   def birth_date
+    check_fetched
     @birth_date
   end
 
   def infohash(key)
+    check_fetched
     instance_variable_get("@infohash")[key]
   end
 
   private
+
+  def read_article
+    if redirect_title
+      destination = WikiRecord.new :article_title => redirect_title, :article_body => nil
+      links.build(:target_id => destination.id).save
+    else
+      return if !fetched?
+      parse_info_box article_body if person?
+    end
+  end
+
+  def check_fetched
+    raise Exceptions::WikiRecordStateError unless fetched?
+  end
 
   def parse_date_template input
     # All we care about is the first three integers in succession, delimited by pipes

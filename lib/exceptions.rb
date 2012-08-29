@@ -16,4 +16,10 @@ module Exceptions
       "Article is not of a person."
     end
   end
+
+  class WikiRecordStateError < StandardError
+    def message
+      "Operation not possible before fetching article."
+    end
+  end
 end

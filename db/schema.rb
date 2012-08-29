@@ -11,7 +11,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120809224946) do
+ActiveRecord::Schema.define(:version => 20120818064257) do
+
+  create_table "links", :force => true do |t|
+    t.integer  "wiki_record_id"
+    t.integer  "target_id"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+  end
 
   create_table "people", :force => true do |t|
     t.boolean  "alive"
@@ -31,5 +38,7 @@ ActiveRecord::Schema.define(:version => 20120809224946) do
     t.datetime "updated_at",    :null => false
     t.integer  "redirect_id"
   end
+
+  add_index "wiki_records", ["article_title"], :name => "index_wiki_records_on_article_title", :unique => true
 
 end

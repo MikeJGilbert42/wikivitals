@@ -33,15 +33,21 @@ describe WikiRecord do
       end
 
       it "works on Sherlock Holmes" do
+        @sherlock.should_not == nil
         @sherlock.person?.should == false
       end
 
       it "works on Elvis" do
+        @elvis.should_not == nil
         @elvis.person?.should == true
       end
     end
     describe "#birth_date" do
       it "parses birth dates correctly" do
+        @takei.should_not == nil
+        @elvis.should_not == nil
+        @sam_neill.should_not == nil
+        @einstein.should_not == nil
         @takei.birth_date.should == Date.parse("20/4/1937")
         @elvis.birth_date.should == Date.parse("8/1/1935")
         @sam_neill.birth_date.should == Date.parse("14/9/1947")
@@ -51,10 +57,12 @@ describe WikiRecord do
 
     describe "#alive?" do
       it "shows George Takei as being alive" do
+        @takei.should_not == nil
         @takei.alive?.should == true
       end
 
       it "shows Elvis as being dead" do
+        @elvis.should_not == nil
         @elvis.alive?.should == false
       end
 
