@@ -1,6 +1,6 @@
 class WikiRecord < ActiveRecord::Base
 
-  after_initialize :read_article, :if => :fetched?
+  after_create :read_article, :if => :fetched?
   belongs_to :redirect, :class_name => "WikiRecord"
 
   has_many :links
@@ -28,21 +28,25 @@ class WikiRecord < ActiveRecord::Base
   def alive?
     check_fetched
     false if !person?
-    @alive_category || !@dead_category || @infobox && @death_date.nil?
+    infohash(:alive_category) || !infohash(:dead_category) || infohash(:death_date).nil?
   end
 
   def death_date
     check_fetched
-    @death_date
+    infohash(:death_date)
   end
 
   def birth_date
     check_fetched
-    @birth_date
+    infohash(:birth_date)
   end
 
   def infohash(key)
     check_fetched
+    if @infohash.nil?
+      parse_info_box article_body if person?
+    end
+    return nil if @infohash.nil?
     instance_variable_get("@infohash")[key]
   end
 
@@ -106,17 +110,14 @@ class WikiRecord < ActiveRecord::Base
         next if x[0].nil?
         @infohash[x[0].to_sym] = x[1] == "" ? nil : x[1]
       end
-      if (@infohash[:death_date])
-        @death_date = parse_date_template @infohash[:death_date]
-      end
-      if (@infohash[:birth_date])
-        @birth_date = parse_date_template @infohash[:birth_date]
-      end
+      # Convert Wikipedia dates to Ruby dates
+      @infohash[:death_date] = parse_date_template @infohash[:death_date] if (@infohash[:death_date])
+      @infohash[:birth_date] = parse_date_template @infohash[:birth_date] if (@infohash[:birth_date])
     end
 
     #Infer name if not present
     @infohash[:name] = article_title.gsub('_', ' ') if @infohash[:name].nil?
-    @alive_category = !(body.index(/Category:Living people/).nil?)
-    @dead_category = !(body.index(/Category:\d+ deaths/).nil?)
+    @infohash[:alive_category] = !(body.index(/Category:Living people/).nil?)
+    @infohash[:dead_category] = !(body.index(/Category:\d+ deaths/).nil?)
   end
 end
