@@ -15,6 +15,12 @@ describe WikiRecord do
       source.save!
       WikiRecord.where(:article_title => "Source").first.redirect.article_title.should == "Destination"
     end
+    it "saves the redirected wiki_record in the database" do
+      WikiFetcher.get "Einstein"
+      WikiRecord.where(:article_title => "Einstein").should be
+      WikiRecord.should_receive(:get_article_body).exactly(0).times
+      WikiFetcher.get "Einstein"
+    end
   end
 
   describe "reading an article" do
@@ -27,27 +33,27 @@ describe WikiRecord do
     end
     describe "#person?" do
       it "works on people of type person" do
-        @sam_neill.should_not == nil
-        @sam_neill.person?.should == true
-        @takei.person?.should == true
+        @sam_neill.should be
+        @sam_neill.person?.should be_true
+        @takei.person?.should be_true
       end
 
       it "works on Sherlock Holmes" do
-        @sherlock.should_not == nil
-        @sherlock.person?.should == false
+        @sherlock.should be
+        @sherlock.person?.should be_false
       end
 
       it "works on Elvis" do
-        @elvis.should_not == nil
-        @elvis.person?.should == true
+        @elvis.should be
+        @elvis.person?.should be_true
       end
     end
     describe "#birth_date" do
       it "parses birth dates correctly" do
-        @takei.should_not == nil
-        @elvis.should_not == nil
-        @sam_neill.should_not == nil
-        @einstein.should_not == nil
+        @takei.should be
+        @elvis.should be
+        @sam_neill.should be
+        @einstein.should be
         @takei.birth_date.should == Date.parse("20/4/1937")
         @elvis.birth_date.should == Date.parse("8/1/1935")
         @sam_neill.birth_date.should == Date.parse("14/9/1947")
@@ -57,18 +63,18 @@ describe WikiRecord do
 
     describe "#alive?" do
       it "shows George Takei as being alive" do
-        @takei.should_not == nil
-        @takei.alive?.should == true
+        @takei.should be
+        @takei.alive?.should be_true
       end
 
       it "shows Elvis as being dead" do
-        @elvis.should_not == nil
-        @elvis.alive?.should == false
+        @elvis.should be
+        @elvis.alive?.should be_false
       end
 
       it "handles Joe Dean being alive even though he has no infobox" do
         joe = WikiFetcher.get "Joe_Dean"
-        joe.alive?.should == true
+        joe.alive?.should be_true
       end
     end
   end
@@ -98,12 +104,12 @@ describe WikiRecord do
   describe "#find" do
     it "works on Archduke Franz Ferdinand" do
       franz = WikiFetcher.get "Archduke_Franz_Ferdinand_of_Austria"
-      franz.person?.should == true
+      franz.person?.should be_true
     end
 
     it "works on Alexander Hamilton" do
       alex = WikiFetcher.get "Alexander_Hamilton"
-      alex.person?.should == true
+      alex.person?.should be_true
     end
 
     it "should only fetch the Wikipedia article once" do
