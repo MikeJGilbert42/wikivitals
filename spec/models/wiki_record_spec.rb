@@ -21,6 +21,22 @@ describe WikiRecord do
       WikiRecord.should_receive(:get_article_body).exactly(0).times
       WikiFetcher.get "Einstein"
     end
+    it "saves redirects in the links join table" do
+      WikiFetcher.get "Einstein"
+      source = WikiRecord.where(article_title: "Einstein").first
+      destination = WikiRecord.where(article_title: "Albert_Einstein").first
+      source.targets.first.should == destination
+      source.targets.count.should == 1
+      source.links.count.should == 1
+    end
+    it "handles double redirects" do
+      WikiFetcher.get "Einstine" # fake article ...
+      WikiRecord.all.count.should == 3
+      one = WikiRecord.where(article_title: "Einstine").first
+      two = WikiRecord.where(article_title: "Einstein").first
+      three = WikiRecord.where(article_title: "Albert_Einstein").first
+      [one, two, three].map(&:targets).map(&:count).should == [1, 1, 0]
+    end
   end
 
   describe "reading an article" do

@@ -8,7 +8,7 @@ class WikiRecord < ActiveRecord::Base
 
   def article_body= body
     write_attribute(:article_body, body)
-    read_article if body
+    read_article
   end
 
   def fetched?
@@ -54,12 +54,13 @@ class WikiRecord < ActiveRecord::Base
 
   def read_article
     if redirect_title
-      destination = WikiRecord.new :article_title => redirect_title, :article_body => nil
-      links.build(:target_id => destination.id).save
+      destination = WikiRecord.find_or_create_by_article_title(redirect_title)
+      targets << destination unless targets.include? destination
     else
       return if !fetched?
       parse_info_box article_body if person?
     end
+    return nil
   end
 
   def check_fetched
@@ -117,6 +118,7 @@ class WikiRecord < ActiveRecord::Base
 
     #Infer name if not present
     @infohash[:name] = article_title.gsub('_', ' ') if @infohash[:name].nil?
+    #Backup means of determining liveness
     @infohash[:alive_category] = !(body.index(/Category:Living people/).nil?)
     @infohash[:dead_category] = !(body.index(/Category:\d+ deaths/).nil?)
   end

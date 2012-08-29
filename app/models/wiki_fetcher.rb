@@ -21,10 +21,7 @@ class WikiFetcher
   def self.find_article page_name
     record = nil
     page_name = WikiHelper::repair_link(page_name)
-    if (record = WikiRecord.where(:article_title => page_name).first)
-      # Follow permanent redirects
-      record = record.redirect while record.fetched? && record.redirect
-    end
+    record = WikiRecord.where(:article_title => page_name).first
     if record && record.fetched?
       body = record.article_body
     else
@@ -34,8 +31,10 @@ class WikiFetcher
         raise "You're gonna have to be more specific."
       end
       begin
-        record = WikiRecord.new if !record
-        record.article_title = page_name
+        if !record
+          record = WikiRecord.new
+          record.article_title = page_name
+        end
         record.article_body = body
         record.save!
       rescue ActiveRecord::StatementInvalid => e
