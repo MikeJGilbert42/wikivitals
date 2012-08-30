@@ -1,7 +1,6 @@
 class WikiRecord < ActiveRecord::Base
 
   after_create :read_article, :if => :fetched?
-  belongs_to :redirect, :class_name => "WikiRecord"
 
   has_many :links
   has_many :targets, :through => :links
@@ -18,6 +17,11 @@ class WikiRecord < ActiveRecord::Base
   def redirect_title
     check_fetched
     @redirect_title ||= WikiHelper::repair_link((/\A\#REDIRECT\s\[\[([^\]]+)\]\]/i.match(article_body) || [])[1])
+  end
+
+  def redirect
+    check_fetched
+    @redirect ||= targets.first if links.count == 1
   end
 
   def person?

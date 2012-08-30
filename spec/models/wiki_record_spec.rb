@@ -6,15 +6,6 @@ describe WikiRecord do
   end
 
   describe "#redirect" do
-    it "has an activerecord redirect association" do
-      # Disable reading article
-      WikiRecord.any_instance.stub(:read_article).and_return nil
-      source = WikiRecord.create :article_title => "Source", :article_body => nil
-      destination = WikiRecord.create :article_title => "Destination", :article_body => nil
-      source.redirect = destination
-      source.save!
-      WikiRecord.where(:article_title => "Source").first.redirect.article_title.should == "Destination"
-    end
     it "saves the redirected wiki_record in the database" do
       WikiFetcher.get "Einstein"
       WikiRecord.where(:article_title => "Einstein").should be

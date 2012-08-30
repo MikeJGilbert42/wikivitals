@@ -5,14 +5,11 @@ class WikiFetcher
   def self.get page_name, follow_redirects = true
     found = nil
     begin
-      source_page = found
       found = find_article page_name
       if found
-        # Set up the permanent redirect here
-        source_page.update_attributes(:redirect => found) if source_page
-        page_name = found.redirect_title if found.redirect_title
+        page_name = found.redirect.article_title if found.redirect
       end
-    end while follow_redirects && found && found.redirect_title
+    end while follow_redirects && found && found.redirect
     found
   end
 
