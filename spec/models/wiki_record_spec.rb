@@ -7,13 +7,13 @@ describe WikiRecord do
 
   describe "#redirect" do
     it "saves the redirected wiki_record in the database" do
-      WikiFetcher.get "Einstein"
+      WikiRecord.fetch "Einstein"
       WikiRecord.where(:article_title => "Einstein").should be
       WikiRecord.should_receive(:get_article_body).exactly(0).times
-      WikiFetcher.get "Einstein"
+      WikiRecord.fetch "Einstein"
     end
     it "saves redirects in the links join table" do
-      WikiFetcher.get "Einstein"
+      WikiRecord.fetch "Einstein"
       source = WikiRecord.where(article_title: "Einstein").first
       destination = WikiRecord.where(article_title: "Albert_Einstein").first
       source.targets.first.should == destination
@@ -21,7 +21,7 @@ describe WikiRecord do
       source.links.count.should == 1
     end
     it "handles double redirects" do
-      WikiFetcher.get "Einstine" # fake article ...
+      WikiRecord.fetch "Einstine" # fake article ...
       WikiRecord.all.count.should == 3
       one = WikiRecord.where(article_title: "Einstine").first
       two = WikiRecord.where(article_title: "Einstein").first
@@ -32,11 +32,11 @@ describe WikiRecord do
 
   describe "reading an article" do
     before(:all) do
-      @sam_neill = WikiFetcher.get "Sam_Neill"
-      @sherlock = WikiFetcher.get "Sherlock_Holmes"
-      @takei = WikiFetcher.get "George_Takei"
-      @elvis = WikiFetcher.get "Elvis_Presley"
-      @einstein = WikiFetcher.get "Albert_Einstein"
+      let sam_neill = WikiRecord.fetch "Sam_Neill"
+      @sherlock = WikiRecord.fetch "Sherlock_Holmes"
+      @takei = WikiRecord.fetch "George_Takei"
+      @elvis = WikiRecord.fetch "Elvis_Presley"
+      @einstein = WikiRecord.fetch "Albert_Einstein"
     end
     describe "#person?" do
       it "works on people of type person" do
@@ -80,7 +80,7 @@ describe WikiRecord do
       end
 
       it "handles Joe Dean being alive even though he has no infobox" do
-        joe = WikiFetcher.get "Joe_Dean"
+        joe = WikiRecord.fetch "Joe_Dean"
         joe.alive?.should be_true
       end
     end
@@ -88,41 +88,41 @@ describe WikiRecord do
 
   describe "#fetch" do
     it "handles redirects" do
-      einstein = WikiFetcher.get "Einstein"
+      einstein = WikiRecord.fetch "Einstein"
       einstein.infohash(:name).should == "Albert Einstein"
-      sam_neil = WikiFetcher.get "Sam_Neil"
+      sam_neil = WikiRecord.fetch "Sam_Neil"
       sam_neil.infohash(:name).should == "Sam Neill"
     end
     it "handles Abe Lincoln's redirect" do
-      abraham = WikiFetcher.get "Abe_Lincoln"
+      abraham = WikiRecord.fetch "Abe_Lincoln"
       abraham.infohash(:name).should == "Abraham Lincoln"
       abe = WikiRecord.where(:article_title => "Abe_Lincoln").first
       abe.should be
       abe.redirect.should == abraham
     end
     it "throws the right exception on disambiguation pages" do
-      lambda { WikiFetcher.get "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
+      lambda { WikiRecord.fetch "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
     end
     it "repairs redirects when the link is named improperly ([[David Thomas]] instead of [[David_Thomas]])" do
-      lambda { WikiFetcher.get "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
+      lambda { WikiRecord.fetch "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
     end
   end
 
   describe "#find" do
     it "works on Archduke Franz Ferdinand" do
-      franz = WikiFetcher.get "Archduke_Franz_Ferdinand_of_Austria"
+      franz = WikiRecord.fetch "Archduke_Franz_Ferdinand_of_Austria"
       franz.person?.should be_true
     end
 
     it "works on Alexander Hamilton" do
-      alex = WikiFetcher.get "Alexander_Hamilton"
+      alex = WikiRecord.fetch "Alexander_Hamilton"
       alex.person?.should be_true
     end
 
     it "should only fetch the Wikipedia article once" do
-      WikiFetcher.get "Alexander_Hamilton"
+      WikiRecord.fetch "Alexander_Hamilton"
       WikiFetcher.should_receive(:get_article_body).exactly(0).times
-      WikiFetcher.get "Alexander_Hamilton"
+      WikiRecord.fetch "Alexander_Hamilton"
     end
   end
 end

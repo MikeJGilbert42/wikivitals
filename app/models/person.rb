@@ -18,7 +18,7 @@ class Person < ActiveRecord::Base
     person = Person.where(:article_title => article_title).first
     if person.nil?
       begin
-        article = WikiFetcher.get article_title
+        article = WikiRecord.fetch article_title
         person = new_from_wiki_record article
       rescue Exceptions::ArticleNotFound => e
         raise e

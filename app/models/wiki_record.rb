@@ -5,6 +5,45 @@ class WikiRecord < ActiveRecord::Base
   has_many :links
   has_many :targets, :through => :links
 
+  def self.fetch page_name, follow_redirects = true #to become fetch_children?
+    found = nil
+    begin
+      found = find_article page_name
+      if found
+        page_name = found.redirect.article_title if found.redirect
+      end
+    end while follow_redirects && found && found.redirect
+    found
+  end
+
+  def self.find_article page_name
+    record = nil
+    page_name = WikiHelper::repair_link(page_name)
+    record = WikiRecord.where(:article_title => page_name).first #scope this
+    if record && record.fetched?
+      body = record.article_body
+    else
+      body = WikiFetcher.get_article_body page_name
+      if body.include? "may refer to"
+        #TODO: Handle disambiguation pages.
+        raise "You're gonna have to be more specific."
+      end
+      begin
+        if !record
+          record = WikiRecord.new
+          record.article_title = page_name
+        end
+        record.article_body = body
+        record.save!
+      rescue ActiveRecord::StatementInvalid => e
+        # This shouldn't happen because of the 'where' executed above, but just in case...
+        return nil
+      end
+    end
+    record
+  end
+
+
   def article_body= body
     write_attribute(:article_body, body)
     read_article
