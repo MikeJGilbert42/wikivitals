@@ -12,6 +12,7 @@ describe WikiRecord do
       WikiRecord.should_receive(:get_article_body).exactly(0).times
       WikiRecord.fetch "Einstein"
     end
+
     it "saves redirects in the links join table" do
       WikiRecord.fetch "Einstein"
       source = WikiRecord.where(article_title: "Einstein").first
@@ -20,9 +21,10 @@ describe WikiRecord do
       source.targets.count.should == 1
       source.links.count.should == 1
     end
+
     it "handles double redirects" do
-      WikiRecord.fetch "Einstine" # fake article ...
-      WikiRecord.all.count.should == 3
+      WikiRecord.where(article_title: "Albert_Einstein").first.delete
+      lambda { WikiRecord.fetch "Einstine" }.should change { WikiRecord.all.count }.by(3)
       one = WikiRecord.where(article_title: "Einstine").first
       two = WikiRecord.where(article_title: "Einstein").first
       three = WikiRecord.where(article_title: "Albert_Einstein").first
@@ -30,58 +32,52 @@ describe WikiRecord do
     end
   end
 
-  describe "reading an article" do
-    before(:all) do
-      let sam_neill = WikiRecord.fetch "Sam_Neill"
-      @sherlock = WikiRecord.fetch "Sherlock_Holmes"
-      @takei = WikiRecord.fetch "George_Takei"
-      @elvis = WikiRecord.fetch "Elvis_Presley"
-      @einstein = WikiRecord.fetch "Albert_Einstein"
-    end
+  context "reading article bodies" do
+    let(:sam_neill) { WikiRecord.fetch "Sam_Neill" }
+    let(:sherlock)  { WikiRecord.fetch "Sherlock_Holmes" }
+    let(:takei) { WikiRecord.fetch "George_Takei" }
+    let(:elvis) { WikiRecord.fetch "Elvis_Presley" }
+    let(:einstein) { WikiRecord.fetch "Albert_Einstein" }
+
     describe "#person?" do
       it "works on people of type person" do
-        @sam_neill.should be
-        @sam_neill.person?.should be_true
-        @takei.person?.should be_true
+        sam_neill.should be
+        sam_neill.person?.should be_true
+        takei.person?.should be_true
       end
 
-      it "works on Sherlock Holmes" do
-        @sherlock.should be
-        @sherlock.person?.should be_false
+      context "a fictitious person" do
+        subject { sherlock }
+        it { should_not be_person }
       end
 
-      it "works on Elvis" do
-        @elvis.should be
-        @elvis.person?.should be_true
-      end
+      subject { elvis }
+      it { should be_person }
     end
+
     describe "#birth_date" do
       it "parses birth dates correctly" do
-        @takei.should be
-        @elvis.should be
-        @sam_neill.should be
-        @einstein.should be
-        @takei.birth_date.should == Date.parse("20/4/1937")
-        @elvis.birth_date.should == Date.parse("8/1/1935")
-        @sam_neill.birth_date.should == Date.parse("14/9/1947")
-        @einstein.birth_date.should == Date.parse("14/3/1879")
+        takei.birth_date.should == Date.parse("20/4/1937")
+        elvis.birth_date.should == Date.parse("8/1/1935")
+        sam_neill.birth_date.should == Date.parse("14/9/1947")
+        einstein.birth_date.should == Date.parse("14/3/1879")
       end
     end
 
     describe "#alive?" do
-      it "shows George Takei as being alive" do
-        @takei.should be
-        @takei.alive?.should be_true
+      context "George Takei" do
+        subject { takei }
+        it { should be_alive }
       end
 
-      it "shows Elvis as being dead" do
-        @elvis.should be
-        @elvis.alive?.should be_false
+      context "Elvis" do
+        subject { elvis }
+        it { should_not be_alive }
       end
 
-      it "handles Joe Dean being alive even though he has no infobox" do
-        joe = WikiRecord.fetch "Joe_Dean"
-        joe.alive?.should be_true
+      context "A living person with no infobox" do
+        subject { WikiRecord.fetch "Joe_Dean" }
+        it { should be_alive }
       end
     end
   end
