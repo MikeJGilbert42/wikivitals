@@ -19,7 +19,7 @@ class WikiRecord < ActiveRecord::Base
   def self.find_article page_name
     record = nil
     page_name = WikiHelper::repair_link(page_name)
-    record = WikiRecord.where(:article_title => page_name).first #scope this
+    record = WikiRecord.where(:article_title => page_name).first
     if record && record.fetched?
       body = record.article_body
     else
@@ -28,21 +28,15 @@ class WikiRecord < ActiveRecord::Base
         #TODO: Handle disambiguation pages.
         raise "You're gonna have to be more specific."
       end
-      begin
-        if !record
-          record = WikiRecord.new
-          record.article_title = page_name
-        end
-        record.article_body = body
-        record.save!
-      rescue ActiveRecord::StatementInvalid => e
-        # This shouldn't happen because of the 'where' executed above, but just in case...
-        return nil
+      if !record
+        record = WikiRecord.new
+        record.article_title = page_name
       end
+      record.article_body = body
+      record.save!
     end
     record
   end
-
 
   def article_body= body
     write_attribute(:article_body, body)
@@ -54,38 +48,38 @@ class WikiRecord < ActiveRecord::Base
   end
 
   def redirect_title
-    check_fetched
+    ensure_fetched
     @redirect_title ||= WikiHelper::repair_link((/\A\#REDIRECT\s\[\[([^\]]+)\]\]/i.match(article_body) || [])[1])
   end
 
   def redirect
-    check_fetched
+    ensure_fetched
     @redirect ||= targets.first if links.count == 1
   end
 
   def person?
-    check_fetched
+    ensure_fetched
     @is_person ||= has_persondata? article_body
   end
 
   def alive?
-    check_fetched
-    false if !person?
+    ensure_fetched
+    return false if !person?
     infohash(:alive_category) || !infohash(:dead_category) || infohash(:death_date).nil?
   end
 
   def death_date
-    check_fetched
+    ensure_fetched
     infohash(:death_date)
   end
 
   def birth_date
-    check_fetched
+    ensure_fetched
     infohash(:birth_date)
   end
 
   def infohash(key)
-    check_fetched
+    ensure_fetched
     if @infohash.nil?
       parse_info_box article_body if person?
     end
@@ -106,7 +100,7 @@ class WikiRecord < ActiveRecord::Base
     return nil
   end
 
-  def check_fetched
+  def ensure_fetched
     raise Exceptions::WikiRecordStateError unless fetched?
   end
 
@@ -150,9 +144,9 @@ class WikiRecord < ActiveRecord::Base
       @infobox =~ /\{\{Infobox\s([\w ]+)/
 
       data = @infobox.scan(/^\|\s?(.*)$/).flatten.map { |s| s.split(/\s*=\s*/, 2) } #[["x","y"], ["z", ""], ...]
-      data.collect do |x|
-        next if x[0].nil?
-        @infohash[x[0].to_sym] = x[1] == "" ? nil : x[1]
+      @infohash = data.inject({}) do |hash, e|
+        hash[e.first.to_sym] = e.last == "" ? nil : e.last unless e.empty? || e.first.nil?
+        hash
       end
       # Convert Wikipedia dates to Ruby dates
       @infohash[:death_date] = parse_date_template @infohash[:death_date] if (@infohash[:death_date])
