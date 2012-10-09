@@ -109,7 +109,11 @@ class WikiRecord < ActiveRecord::Base
     input =~ /\{\{.*?(\d+)\|(\d+)\|(\d+).*}\}/
     if Regexp.last_match.nil? || Regexp.last_match.length < 3
       # Check for a plain text date (see Alexander Hamilton)
-      Date.parse input.gsub(/\([^\)]*\)/, "")
+      begin
+        Date.parse input.gsub(/\([^\)]*\)/, "")
+      rescue ArgumentError
+        return nil
+      end
     else
       Date.parse Regexp.last_match[1..3].reverse.join("-")
     end

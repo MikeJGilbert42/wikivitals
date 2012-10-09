@@ -12,7 +12,7 @@ def mock_get_article_body page_name
   begin
     body = IO.read file
   rescue Exception => e
-    raise "Problem reading test data file #{file_name}"
+    raise Exceptions::ArticleNotFound.new "Problem reading test data file #{file_name}"
   end
   body
 end

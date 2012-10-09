@@ -38,6 +38,10 @@ describe WikiRecord do
     let(:takei) { WikiRecord.fetch "George_Takei" }
     let(:elvis) { WikiRecord.fetch "Elvis_Presley" }
     let(:einstein) { WikiRecord.fetch "Albert_Einstein" }
+    let(:socrates) { WikiRecord.fetch "Socrates" }
+    let(:ptolemy) { WikiRecord.fetch "Ptolemy" }
+    let(:hippocrates) { WikiRecord.fetch "Hippocrates" }
+    let(:pindar) { WikiRecord.fetch "Pindar" }
 
     describe "#person?" do
       it "works on people of type person" do
@@ -53,6 +57,7 @@ describe WikiRecord do
 
       subject { elvis }
       it { should be_person }
+
     end
 
     describe "#birth_date" do
@@ -78,6 +83,20 @@ describe WikiRecord do
       context "A living person with no infobox" do
         subject { WikiRecord.fetch "Joe_Dean" }
         it { should be_alive }
+      end
+
+      context "Ancient dead people", :focus => true do
+        subject { socrates }
+        it { should_not be_alive }
+
+        subject { ptolemy }
+        it { should_not be_alive }
+
+        subject { hippocrates }
+        it { should_not be_alive }
+
+        subject { pindar }
+        it { should_not be_alive }
       end
     end
   end
