@@ -5,7 +5,7 @@ describe WikiRecord do
     mock_wiki_fetcher
   end
 
-  describe "#redirect" do
+  describe ".redirect" do
     it "saves the redirected wiki_record in the database" do
       WikiRecord.fetch "Einstein"
       WikiRecord.where(:article_title => "Einstein").should be
@@ -32,71 +32,57 @@ describe WikiRecord do
     end
   end
 
-  context "reading article bodies" do
-    let(:sam_neill) { WikiRecord.fetch "Sam_Neill" }
-    let(:sherlock)  { WikiRecord.fetch "Sherlock_Holmes" }
-    let(:takei) { WikiRecord.fetch "George_Takei" }
-    let(:elvis) { WikiRecord.fetch "Elvis_Presley" }
-    let(:einstein) { WikiRecord.fetch "Albert_Einstein" }
-    let(:socrates) { WikiRecord.fetch "Socrates" }
-    let(:ptolemy) { WikiRecord.fetch "Ptolemy" }
-    let(:hippocrates) { WikiRecord.fetch "Hippocrates" }
-    let(:pindar) { WikiRecord.fetch "Pindar" }
 
-    describe "#person?" do
-      it "works on people of type person" do
-        sam_neill.should be
-        sam_neill.person?.should be_true
-        takei.person?.should be_true
+  describe "reading article bodies better" do
+    subject { WikiRecord.fetch article_name }
+    describe "Basic vitals" do
+      context "Sam Neill" do
+        let(:article_name) { "Sam_Neill" }
+        it { should be }
+        it { should be_person }
+        its(:birth_date) { should == Date.parse("14/9/1947") }
       end
-
-      context "a fictitious person" do
-        subject { sherlock }
+      context "Sherlock Holmes" do
+        let(:article_name) { "Sherlock_Holmes" }
         it { should_not be_person }
       end
-
-      subject { elvis }
-      it { should be_person }
-
-    end
-
-    describe "#birth_date" do
-      it "parses birth dates correctly" do
-        takei.birth_date.should == Date.parse("20/4/1937")
-        elvis.birth_date.should == Date.parse("8/1/1935")
-        sam_neill.birth_date.should == Date.parse("14/9/1947")
-        einstein.birth_date.should == Date.parse("14/3/1879")
-      end
-    end
-
-    describe "#alive?" do
-      context "George Takei" do
-        subject { takei }
-        it { should be_alive }
-      end
-
       context "Elvis" do
-        subject { elvis }
+        let(:article_name) { "Elvis_Presley" }
+        it { should be_person }
         it { should_not be_alive }
+        its(:birth_date) { should == Date.parse("8/1/1935") }
       end
-
-      context "A living person with no infobox" do
-        subject { WikiRecord.fetch "Joe_Dean" }
+      context "George Takei" do
+        let(:article_name) { "George_Takei" }
+        its(:birth_date) { should == Date.parse("20/4/1937") }
         it { should be_alive }
       end
-
-      context "Ancient dead people", :focus => true do
-        subject { socrates }
-        it { should_not be_alive }
-
-        subject { ptolemy }
-        it { should_not be_alive }
-
-        subject { hippocrates }
-        it { should_not be_alive }
-
-        subject { pindar }
-        it { should_not be_alive }
+      context "Albert Einstein" do
+        let(:article_name) { "Albert_Einstein" }
+        its(:birth_date) { should == Date.parse("14/3/1879") }
+      end
+      context "a living person with no infobox" do
+        let(:article_name) { "Joe_Dean" }
+        it { should be_alive }
+      end
+      context "ancient dead people" do
+        context "Socrates" do
+          let(:article_name) { "Socrates" }
+          it { should_not be_alive }
+        end
+        context "Ptolemy" do
+          let(:article_name) { "Ptolemy" }
+          it { should_not be_alive }
+          its(:death_date) { should == Date.parse("1/1/0168") }
+        end
+        context "Hippocrates" do
+          let(:article_name) { "Hippocrates" }
+          it { should_not be_alive }
+        end
+        context "Pindar" do
+          let(:article_name) { "Pindar" }
+          it { should_not be_alive }
+        end
       end
     end
   end
@@ -108,6 +94,7 @@ describe WikiRecord do
       sam_neil = WikiRecord.fetch "Sam_Neil"
       sam_neil.infohash(:name).should == "Sam Neill"
     end
+
     it "handles Abe Lincoln's redirect" do
       abraham = WikiRecord.fetch "Abe_Lincoln"
       abraham.infohash(:name).should == "Abraham Lincoln"
@@ -115,6 +102,7 @@ describe WikiRecord do
       abe.should be
       abe.redirect.should == abraham
     end
+
     it "throws the right exception on disambiguation pages" do
       lambda { WikiRecord.fetch "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
     end
