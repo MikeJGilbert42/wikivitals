@@ -1,10 +1,11 @@
 class WikiRecord < ActiveRecord::Base
 
-  after_create :read_article, :if => :fetched?
+  after_initialize :read_article, :if => :fetched?
 
   has_many :links
   has_many :targets, :through => :links
 
+  # Retrieve article based on query string, traversing redirects unless specified.
   def self.fetch page_name, follow_redirects = true #to become fetch_children?
     found = nil
     begin
@@ -16,30 +17,32 @@ class WikiRecord < ActiveRecord::Base
     found
   end
 
+  # Find article in database and populate article body with Wikipedia content if needed.
   def self.find_article page_name
     record = nil
     page_name = WikiHelper::repair_link(page_name)
     record = WikiRecord.where(:article_title => page_name).first
-    if record && record.fetched?
-      body = record.article_body
-    else
+    unless record && record.fetched?
       body = WikiFetcher.get_article_body page_name
       if body.include? "may refer to"
         #TODO: Handle disambiguation pages.
         raise "You're gonna have to be more specific."
       end
       if !record
-        record = WikiRecord.new
-        record.article_title = page_name
+        record = WikiRecord.new :article_title => page_name, :article_body => body
+      else
+        record.article_body = body
       end
-      record.article_body = body
       record.save!
     end
     record
   end
 
+  # Override assignment so we can read the article if the body is provided.
   def article_body= body
     write_attribute(:article_body, body)
+    @infobox = nil
+    @infohash = nil
     read_article
   end
 
@@ -59,6 +62,7 @@ class WikiRecord < ActiveRecord::Base
 
   def person?
     ensure_fetched
+    return @is_person if !@is_person.nil?
     @is_person ||= has_persondata? article_body
   end
 
@@ -80,9 +84,6 @@ class WikiRecord < ActiveRecord::Base
 
   def infohash(key)
     ensure_fetched
-    if @infohash.nil?
-      parse_info_box article_body if person?
-    end
     return nil if @infohash.nil?
     instance_variable_get("@infohash")[key]
   end
@@ -141,7 +142,7 @@ class WikiRecord < ActiveRecord::Base
   end
 
   def parse_info_box body
-    #All the data extraction goes here.
+    return if @infohash
     @infohash = {}
     @infobox = extract_infobox body
     if @infobox
