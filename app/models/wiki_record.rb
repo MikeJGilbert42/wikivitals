@@ -1,19 +1,18 @@
 class WikiRecord < ActiveRecord::Base
 
-  after_initialize :read_article, :if => :fetched?
-
   has_many :links
   has_many :targets, :through => :links
 
   # Retrieve article based on query string, traversing redirects unless specified.
-  def self.fetch page_name, follow_redirects = true #to become fetch_children?
+  def self.fetch page_name, options = {}
+    options = { :follow_redirects => true }.merge options
     found = nil
     begin
       found = find_article page_name
       if found
         page_name = found.redirect.article_title if found.redirect
       end
-    end while follow_redirects && found && found.redirect
+    end while options[:follow_redirects] && found && found.redirect
     found
   end
 
@@ -50,24 +49,23 @@ class WikiRecord < ActiveRecord::Base
     !!article_body
   end
 
-  def redirect_title
-    ensure_fetched
-    @redirect_title ||= WikiHelper::repair_link((/\A\#REDIRECT\s\[\[([^\]]+)\]\]/i.match(article_body) || [])[1])
-  end
-
   def redirect
+    return @redirect if @redirect
     ensure_fetched
-    @redirect ||= targets.first if links.count == 1
+    ensure_read
+    @redirect = targets.first if links.count == 1
   end
 
   def person?
-    ensure_fetched
     return @is_person if !@is_person.nil?
-    @is_person ||= has_persondata? article_body
+    ensure_fetched
+    ensure_read
+    @is_person = has_persondata? article_body
   end
 
   def alive?
     ensure_fetched
+    ensure_read
     return false if !person?
     categories_suggest_alive = infohash(:alive_category) || !infohash(:dead_category)
     # Death date = certainty
@@ -76,16 +74,19 @@ class WikiRecord < ActiveRecord::Base
 
   def death_date
     ensure_fetched
+    ensure_read
     infohash(:death_date)
   end
 
   def birth_date
     ensure_fetched
+    ensure_read
     infohash(:birth_date)
   end
 
   def infohash(key)
     ensure_fetched
+    ensure_read
     return nil if @infohash.nil?
     instance_variable_get("@infohash")[key]
   end
@@ -94,17 +95,31 @@ class WikiRecord < ActiveRecord::Base
 
   def read_article
     if redirect_title
-      destination = WikiRecord.find_or_create_by_article_title(redirect_title)
-      targets << destination unless targets.include? destination
+      @infohash = {}
+      return if targets.map(&:article_title).include? redirect_title
+      destination = WikiRecord.where(:article_title => redirect_title).first
+      destination = WikiRecord.fetch redirect_title if !destination # Recursive call!  I hope this doesn't come back to bite me ...
+      @infohash[:redirect] = redirect_title
+      targets << destination
     else
       return if !fetched?
-      parse_info_box article_body if person?
-      parse_persondata article_body if person?
+      @infohash = {}
+      parse_info_box article_body
+      parse_persondata article_body
     end
   end
 
   def ensure_fetched
     raise Exceptions::WikiRecordStateError unless fetched?
+  end
+
+  def ensure_read
+    read_article if !@infohash
+  end
+
+  def redirect_title
+    ensure_fetched
+    @redirect_title ||= WikiHelper::repair_link((/\A\#REDIRECT\s\[\[([^\]]+)\]\]/i.match(article_body) || [])[1])
   end
 
   def make_date_from_year year
@@ -163,9 +178,9 @@ class WikiRecord < ActiveRecord::Base
   end
 
   def parse_info_box body
-    return if @infohash
     @infohash = {}
     @infobox = extract_infobox body
+    return unless @infobox
     @infobox =~ /\{\{Infobox\s+([\w ]+)/
     @person_type = Regexp.last_match(1)
     if @infobox
@@ -189,6 +204,7 @@ class WikiRecord < ActiveRecord::Base
   def parse_persondata body
     # Fill in blanks with this alternate, less-reliable info
     @persondata = extract_persondata body
+    return unless @persondata
     @infohash[:birth_date] = parse_date_template Regexp.last_match[1] if !@infohash[:birth_date] && @persondata =~ /DATE OF BIRTH\s*=\s*(\d+\sBC)/i
     @infohash[:death_date] = parse_date_template Regexp.last_match[1] if !@infohash[:death_date] && @persondata =~ /DATE OF DEATH\s*=\s*(\d+\sBC)/i
   end

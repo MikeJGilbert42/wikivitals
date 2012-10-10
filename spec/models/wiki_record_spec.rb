@@ -101,6 +101,8 @@ describe WikiRecord do
       abe = WikiRecord.where(:article_title => "Abe_Lincoln").first
       abe.should be
       abe.redirect.should == abraham
+      abe2 = WikiRecord.fetch "Abe_Lincoln", :follow_redirects => false
+      abe2.should == abe
     end
 
     it "throws the right exception on disambiguation pages" do

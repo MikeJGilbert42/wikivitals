@@ -3,9 +3,11 @@ module WikiHelper
   def self.repair_link link
     return nil if link.nil?
     # Capitalize all words except of, the, and, excluding words inside parentheses
+    link.gsub!("_", " ")
     link =~ /([^\(]*)(\([^\)]*\))?/
     name, parenthetical = Regexp.last_match[1..2]
-    name = name.titlecase.gsub(/The|And|Of/) { |s| s.downcase }
+    name.gsub!(/\w+/) { |s| s[0] = s[0].upcase; s }
+    name.gsub!(/The|And|Of/) { $&.downcase }
     name.concat(parenthetical || "").gsub(" ", "_")
   end
 end
