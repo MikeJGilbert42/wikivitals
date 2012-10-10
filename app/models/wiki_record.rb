@@ -69,7 +69,9 @@ class WikiRecord < ActiveRecord::Base
   def alive?
     ensure_fetched
     return false if !person?
-    infohash(:alive_category) || !infohash(:dead_category) || infohash(:death_date).nil?
+    categories_suggest_alive = infohash(:alive_category) || !infohash(:dead_category)
+    # Death date = certainty
+    infohash(:death_date).nil? && categories_suggest_alive
   end
 
   def death_date
@@ -97,37 +99,48 @@ class WikiRecord < ActiveRecord::Base
     else
       return if !fetched?
       parse_info_box article_body if person?
+      parse_persondata article_body if person?
     end
-    return nil
   end
 
   def ensure_fetched
     raise Exceptions::WikiRecordStateError unless fetched?
   end
 
+  def make_date_from_year year
+    #return Date.parse "1/1/" + year.gsub(/\d+/, "%04d" % $&.to_i) # this is broken right now in Rails, so do below instead
+    numeric = year.to_i
+    return Date.parse "1/1/" + year.gsub(/\d+/, "%04d" % numeric)
+  end
+
   def parse_date_template input
-    # All we care about is the first three integers in succession, delimited by pipes
-    input =~ /\{\{.*?(\d+)\|(\d+)\|(\d+).*}\}/
-    if Regexp.last_match.nil? || Regexp.last_match.length < 3
-      # Check for a plain text date (see Alexander Hamilton)
-      begin
-        Date.parse input.gsub(/\([^\)]*\)/, "")
-      rescue ArgumentError
-        return nil
-      end
-    else
-      Date.parse Regexp.last_match[1..3].reverse.join("-")
+    # Process * Date [And Age] template
+    input =~ /\{\{.*?date(?: and age)?.*?\|(\d+)\|(\d+)\|(\d+).*\}\}/i
+    return Date.parse Regexp.last_match[1..3].reverse.join("-") if Regexp.last_match && Regexp.last_match.length >= 3
+
+    # Process * Year [And Age] template
+    if input =~ /\{\{.*?year(?: and age)?\|(\d+\s?(B\.?C)?).*?\}\}/i
+      return make_date_from_year "#{Regexp.last_match[1]} #{Regexp.last_match[2]}"
     end
+
+    # Check to see if it parses as a plain text date (see Alexander Hamilton)
+    return Date.parse input.gsub(/\([^\)]*\)/, "") rescue ArgumentError
+
+    # If nothing else worked, maybe it contains a plain text year.
+    if input =~ /\d+\s?(B\.?C)?/i
+      return make_date_from_year Regexp.last_match[0]
+    end
+
+    return nil
   end
 
   def has_persondata? body
     !(body.index(/\{\{Persondata[^\}]*\}\}/).nil?)
   end
 
-  def extract_infobox body
-    start_index = body =~ /\{\{Infobox\s+([\w ]+)/
+  def extract_template name, body
+    start_index = body =~ /\{\{#{name}/
     return nil if !(start_index)
-    @person_type = Regexp.last_match(1)
     open = 0
     end_index = 0
     body[start_index..-1].split("").each_with_index do |c, index|
@@ -141,13 +154,21 @@ class WikiRecord < ActiveRecord::Base
     body[start_index..end_index]
   end
 
+  def extract_infobox body
+    extract_template "Infobox", body
+  end
+
+  def extract_persondata body
+    extract_template "Persondata", body
+  end
+
   def parse_info_box body
     return if @infohash
     @infohash = {}
     @infobox = extract_infobox body
+    @infobox =~ /\{\{Infobox\s+([\w ]+)/
+    @person_type = Regexp.last_match(1)
     if @infobox
-      @infobox =~ /\{\{Infobox\s([\w ]+)/
-
       data = @infobox.scan(/^\|\s?(.*)$/).flatten.map { |s| s.split(/\s*=\s*/, 2) } #[["x","y"], ["z", ""], ...]
       @infohash = data.inject({}) do |hash, e|
         hash[e.first.to_sym] = e.last == "" ? nil : e.last unless e.empty? || e.first.nil?
@@ -163,5 +184,12 @@ class WikiRecord < ActiveRecord::Base
     #Backup means of determining liveness
     @infohash[:alive_category] = !(body.index(/Category:Living people/).nil?)
     @infohash[:dead_category] = !(body.index(/Category:\d+ deaths/).nil?)
+  end
+
+  def parse_persondata body
+    # Fill in blanks with this alternate, less-reliable info
+    @persondata = extract_persondata body
+    @infohash[:birth_date] = parse_date_template Regexp.last_match[1] if !@infohash[:birth_date] && @persondata =~ /DATE OF BIRTH\s*=\s*(\d+\sBC)/i
+    @infohash[:death_date] = parse_date_template Regexp.last_match[1] if !@infohash[:death_date] && @persondata =~ /DATE OF DEATH\s*=\s*(\d+\sBC)/i
   end
 end
