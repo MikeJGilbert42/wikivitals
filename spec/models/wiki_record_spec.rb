@@ -104,13 +104,6 @@ describe WikiRecord do
       abe2 = WikiRecord.fetch "Abe_Lincoln", :follow_redirects => false
       abe2.should == abe
     end
-
-    it "throws the right exception on disambiguation pages" do
-      lambda { WikiRecord.fetch "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
-    end
-    it "repairs redirects when the link is named improperly ([[David Thomas]] instead of [[David_Thomas]])" do
-      lambda { WikiRecord.fetch "David_Thomas" }.should raise_error(RuntimeError, "You're gonna have to be more specific.")
-    end
   end
 
   describe "#find" do

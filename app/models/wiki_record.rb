@@ -21,50 +21,27 @@ class WikiRecord < ActiveRecord::Base
     record = nil
     page_name = WikiHelper::repair_link(page_name)
     record = WikiRecord.where(:article_title => page_name).first
-    unless record && record.fetched?
+    unless record
       body = WikiFetcher.get_article_body page_name
-      if body.include? "may refer to"
-        #TODO: Handle disambiguation pages.
-        raise "You're gonna have to be more specific."
-      end
-      if !record
-        record = WikiRecord.new :article_title => page_name, :article_body => body
-      else
-        record.article_body = body
-      end
+      record = WikiRecord.new :article_title => page_name, :article_body => body
       record.save!
     end
     record
   end
 
-  # Override assignment so we can read the article if the body is provided.
-  def article_body= body
-    write_attribute(:article_body, body)
-    @infobox = nil
-    @infohash = nil
-    read_article
-  end
-
-  def fetched?
-    !!article_body
-  end
-
   def redirect
     return @redirect if @redirect
-    ensure_fetched
     ensure_read
     @redirect = targets.first if links.count == 1
   end
 
   def person?
     return @is_person if !@is_person.nil?
-    ensure_fetched
     ensure_read
     @is_person = has_persondata? article_body
   end
 
   def alive?
-    ensure_fetched
     ensure_read
     return false if !person?
     categories_suggest_alive = infohash(:alive_category) || !infohash(:dead_category)
@@ -73,19 +50,16 @@ class WikiRecord < ActiveRecord::Base
   end
 
   def death_date
-    ensure_fetched
     ensure_read
     infohash(:death_date)
   end
 
   def birth_date
-    ensure_fetched
     ensure_read
     infohash(:birth_date)
   end
 
   def infohash(key)
-    ensure_fetched
     ensure_read
     return nil if @infohash.nil?
     instance_variable_get("@infohash")[key]
@@ -102,15 +76,10 @@ class WikiRecord < ActiveRecord::Base
       @infohash[:redirect] = redirect_title
       targets << destination
     else
-      return if !fetched?
       @infohash = {}
       parse_info_box article_body
       parse_persondata article_body
     end
-  end
-
-  def ensure_fetched
-    raise Exceptions::WikiRecordStateError unless fetched?
   end
 
   def ensure_read
@@ -118,7 +87,6 @@ class WikiRecord < ActiveRecord::Base
   end
 
   def redirect_title
-    ensure_fetched
     @redirect_title ||= WikiHelper::repair_link((/\A\#REDIRECT\s\[\[([^\]]+)\]\]/i.match(article_body) || [])[1])
   end
 
