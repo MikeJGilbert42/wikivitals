@@ -84,6 +84,10 @@ describe WikiRecord do
           it { should_not be_alive }
         end
       end
+      context "Beach volleyball player David Thomas" do
+        let(:article_name) { "David_Thomas_(beach_volleyball)" }
+        it { should be_person }
+      end
     end
   end
 
@@ -121,6 +125,17 @@ describe WikiRecord do
       WikiRecord.fetch "Alexander_Hamilton"
       WikiFetcher.should_receive(:get_article_body).exactly(0).times
       WikiRecord.fetch "Alexander_Hamilton"
+    end
+  end
+
+  describe "disambiguations" do
+    subject { WikiRecord.fetch article_name }
+    describe "processing" do
+      context "David Thomas disambiguation page" do
+        let(:article_name) { "David_Thomas" }
+        it { should be_disambiguation }
+        it { should have(8).targets }
+      end
     end
   end
 end

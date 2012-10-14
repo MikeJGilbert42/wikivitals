@@ -68,13 +68,20 @@ class WikiRecord < ActiveRecord::Base
   private
 
   def read_article
-    if redirect_title
+    if redirect?
       @infohash = {}
       return if targets.map(&:article_title).include? redirect_title
-      destination = WikiRecord.where(:article_title => redirect_title).first
-      destination = WikiRecord.fetch redirect_title if !destination # Recursive call!  I hope this doesn't come back to bite me ...
+      destination = WikiRecord.find_article redirect_title # Recursive call!  I hope this doesn't come back to bite me ...
       @infohash[:redirect] = redirect_title
       targets << destination
+    elsif disambiguation?
+      @infohash = {}
+      @infohash[:disambiguation] = true # placeholder
+      link_titles = disambiguation_links_from_body
+      link_titles.each do |title|
+        article = WikiRecord.fetch title
+        targets << article if article.person?
+      end
     else
       @infohash = {}
       parse_info_box article_body
@@ -84,6 +91,15 @@ class WikiRecord < ActiveRecord::Base
 
   def ensure_read
     read_article if !@infohash
+  end
+
+  def redirect?
+    redirect_title != nil
+  end
+
+  def disambiguation?
+    return @is_disambiguation if !@disambiguation.nil?
+    @is_disambiguation = article_body =~ /may refer to/i
   end
 
   def redirect_title
@@ -175,5 +191,9 @@ class WikiRecord < ActiveRecord::Base
     return unless @persondata
     @infohash[:birth_date] = parse_date_template Regexp.last_match[1] if !@infohash[:birth_date] && @persondata =~ /DATE OF BIRTH\s*=\s*(\d+\sBC)/i
     @infohash[:death_date] = parse_date_template Regexp.last_match[1] if !@infohash[:death_date] && @persondata =~ /DATE OF DEATH\s*=\s*(\d+\sBC)/i
+  end
+
+  def disambiguation_links_from_body
+    article_body.scan(/\*\s*\[\[(.*?)\]\]/).flatten.map { |b| WikiHelper::repair_link b }
   end
 end
