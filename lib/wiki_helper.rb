@@ -1,6 +1,7 @@
 module WikiHelper
+  extend ActiveSupport::Concern
   # Repair common mistakes found in case and formatting.
-  def self.repair_link link
+  def repair_link link
     return nil if link.nil?
     # Capitalize all words except of, the, and, excluding words inside parentheses
     link.gsub!("_", " ")

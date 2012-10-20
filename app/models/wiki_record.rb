@@ -1,5 +1,6 @@
 class WikiRecord < ActiveRecord::Base
   include ActionView::Helpers::TextHelper
+  include WikiHelper
 
   has_many :links
   has_many :targets, :through => :links
@@ -20,7 +21,7 @@ class WikiRecord < ActiveRecord::Base
   # Find article in database and populate article body with Wikipedia content if needed.
   def self.find_article page_name
     record = nil
-    page_name = WikiHelper::repair_link(page_name)
+    page_name = repair_link(page_name)
     record = WikiRecord.where(:article_title => page_name).first
     unless record
       body = WikiFetcher.get_article_body page_name
@@ -111,7 +112,7 @@ class WikiRecord < ActiveRecord::Base
   end
 
   def redirect_title
-    @redirect_title ||= WikiHelper::repair_link((/\A\#REDIRECT\s\[\[([^\]]+)\]\]/i.match(article_body) || [])[1])
+    @redirect_title ||= repair_link((/\A\#REDIRECT\s\[\[([^\]]+)\]\]/i.match(article_body) || [])[1])
   end
 
   def make_date_from_year year
@@ -202,6 +203,6 @@ class WikiRecord < ActiveRecord::Base
   end
 
   def disambiguation_links_from_body
-    article_body.scan(/\*\s*\[\[(.*?)\]\]/).flatten.map { |b| WikiHelper::repair_link b }
+    article_body.scan(/\*\s*\[\[(.*?)\]\]/).flatten.map { |b| repair_link b }
   end
 end
