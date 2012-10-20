@@ -1,4 +1,5 @@
 class WikiRecord < ActiveRecord::Base
+  include ActionView::Helpers::TextHelper
 
   has_many :links
   has_many :targets, :through => :links
@@ -63,6 +64,13 @@ class WikiRecord < ActiveRecord::Base
     ensure_read
     return nil if @infohash.nil?
     instance_variable_get("@infohash")[key]
+  end
+
+  def to_s
+    string = "WikiRecord [[#{article_title}]]"
+    string += " Name: #{@infohash[:name]} " if @infohash && @infohash[:name]
+    string += " Links: [" + truncate(targets.pluck(:article_title).join(', '), :length => 100) + "]" unless targets.empty?
+    string += " Body: #{truncate(article_body, :length => 100)}"
   end
 
   private
