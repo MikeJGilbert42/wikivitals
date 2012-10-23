@@ -43,22 +43,35 @@ class WikiRecord < ActiveRecord::Base
     @is_person = has_persondata? article_body
   end
 
+  def explain_living_status
+    reasons = []
+    reasons << "Has#{infohash(:alive_category) ? nil : ' no'} alive category"
+    reasons << "Has#{infohash(:dead_category) ? nil : ' no'} dead category"
+    reasons << "Has#{infohash(:death_date) ? nil : ' no'} death date in infobox"
+    reasons << "Has#{infohash(:alt_death_date) ? nil : ' no'} death date in persondata"
+  end
+
+  def too_old_to_be_alive?
+    birth_date && birth_date + 200.years < Date.today
+  end
+
   def alive?
     ensure_read
     return false if !person?
     categories_suggest_alive = infohash(:alive_category) || !infohash(:dead_category)
-    # Death date = certainty
-    infohash(:death_date).nil? && categories_suggest_alive
+    certainly_dead = infohash(:death_date) || too_old_to_be_alive?
+    possibly_dead = !categories_suggest_alive && infohash(:alt_death_date)
+    !certainly_dead && !possibly_dead
   end
 
   def death_date
     ensure_read
-    infohash(:death_date)
+    infohash(:death_date) || infohash(:alt_death_date)
   end
 
   def birth_date
     ensure_read
-    infohash(:birth_date)
+    infohash(:birth_date) || infohash(:alt_birth_date)
   end
 
   def infohash(key)
@@ -198,8 +211,8 @@ class WikiRecord < ActiveRecord::Base
     # Fill in blanks with this alternate, less-reliable info
     @persondata = extract_persondata body
     return unless @persondata
-    @infohash[:birth_date] = parse_date_template Regexp.last_match[1] if !@infohash[:birth_date] && @persondata =~ /DATE OF BIRTH\s*=\s*(\d+\sBC)/i
-    @infohash[:death_date] = parse_date_template Regexp.last_match[1] if !@infohash[:death_date] && @persondata =~ /DATE OF DEATH\s*=\s*(\d+\sBC)/i
+    @infohash[:alt_birth_date] = parse_date_template Regexp.last_match[1] if @persondata =~ /DATE OF BIRTH\s*=(.*)$/i
+    @infohash[:alt_death_date] = parse_date_template Regexp.last_match[1] if @persondata =~ /DATE OF DEATH\s*=(.*)$/i
   end
 
   def disambiguation_links_from_body
