@@ -101,8 +101,9 @@ class WikiRecord < ActiveRecord::Base
       @infohash[:disambiguation] = true # placeholder
       link_titles = disambiguation_links_from_body
       link_titles.each do |title|
-        article = WikiRecord.fetch title
-        targets << article if article.person?
+        article = WikiRecord.fetch title rescue Exceptions::ArticleNotFound # swallow this error; broken links exist sometimes.
+        binding.pry
+        targets << article if article && article.person?
       end
     else
       @infohash = {}
@@ -216,6 +217,7 @@ class WikiRecord < ActiveRecord::Base
   end
 
   def disambiguation_links_from_body
-    article_body.scan(/\*\s*\[\[(.*?)\]\]/).flatten.map { |b| repair_link b }
+    binding.pry
+    article_body.to(article_body.index('==See also==') || -1).scan(/\*\s*\[\[(.*?)\]\]/).flatten.map { |b| repair_link b }
   end
 end
