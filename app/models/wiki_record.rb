@@ -5,6 +5,8 @@ class WikiRecord < ActiveRecord::Base
   has_many :links
   has_many :targets, :through => :links
 
+  OLD_AGE_CUTOFF = 150
+
   # Retrieve article based on query string, traversing redirects unless specified.
   def self.fetch page_name, options = {}
     options = { :follow_redirects => true }.merge options
@@ -45,14 +47,15 @@ class WikiRecord < ActiveRecord::Base
 
   def explain_living_status
     reasons = []
-    reasons << "Has#{infohash(:alive_category) ? nil : ' no'} alive category"
-    reasons << "Has#{infohash(:dead_category) ? nil : ' no'} dead category"
-    reasons << "Has#{infohash(:death_date) ? nil : ' no'} death date in infobox"
-    reasons << "Has#{infohash(:alt_death_date) ? nil : ' no'} death date in persondata"
+    reasons << "Has#{infohash(:alive_category) ? '' : ' no'} alive category"
+    reasons << "Has#{infohash(:dead_category) ? '' : ' no'} dead category"
+    reasons << "Has#{infohash(:death_date) ? '' : ' no'} death date in infobox"
+    reasons << "Has#{infohash(:alt_death_date) ? '' : ' no'} death date in persondata"
+    reasons << "Was#{too_old_to_be_alive? ? ' not' : '' } born within the past #{OLD_AGE_CUTOFF} years"
   end
 
   def too_old_to_be_alive?
-    birth_date && birth_date + 200.years < Date.today
+    birth_date && birth_date + OLD_AGE_CUTOFF.years < Date.today
   end
 
   def alive?
