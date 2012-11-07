@@ -7,7 +7,8 @@ Wikivitals::Application.routes.draw do
   #   match 'products/:id' => 'catalog#view'
   # Keep in mind you can assign values other than :controller and :action
   match 'people/show/:id' => 'people#show'
-  match 'people/search/:q' => 'people#search'
+  match 'search' => 'search#search'
+  match 'disambiguate/:record' => 'search#disambiguate'
 
   # Sample of named route:
   #   match 'products/:id/purchase' => 'catalog#purchase', :as => :purchase
@@ -51,7 +52,7 @@ Wikivitals::Application.routes.draw do
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
   # root :to => 'welcome#index'
-  root :to => 'people#search'
+  root :to => 'search#index'
   # See how all your routes lay out with "rake routes"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.

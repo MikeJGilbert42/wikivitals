@@ -1,0 +1,7 @@
+<div class='people-search'>
+  <%= form_tag 'search', :action => 'search', :method => 'get'  do %>
+    <%= label_tag(:q, "Name:") %>
+    <%= text_field_tag(:q) %>
+    <input type="submit" value="Search" />
+  <% end %>
+</div>

@@ -95,7 +95,7 @@ class WikiRecord < ActiveRecord::Base
   end
 
   def disambiguation?
-    return @is_disambiguation if !@disambiguation.nil?
+    return @is_disambiguation if !@is_disambiguation.nil?
     @is_disambiguation = article_body =~ /may refer to/i
   end
 
@@ -104,7 +104,7 @@ class WikiRecord < ActiveRecord::Base
   def read_article
     if redirect?
       @infohash = {}
-      return if targets.map(&:article_title).include? redirect_title
+      return if targets.pluck(:article_title).include? redirect_title
       destination = WikiRecord.find_article redirect_title # Recursive call!  I hope this doesn't come back to bite me ...
       @infohash[:redirect] = redirect_title
       targets << destination
