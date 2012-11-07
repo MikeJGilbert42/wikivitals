@@ -30,6 +30,7 @@ group :test do
   gem "spork"
   gem "shoulda-matchers"
   gem "webmock"
+  gem 'rb-inotify', '~> 0.8.8'
 end
 
 group :test, :development do
