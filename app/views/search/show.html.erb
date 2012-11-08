@@ -1,9 +1,9 @@
 <div>
-  <p class="person-name"><%= @person.name %> is...</p>
+  <p class="person-name"><%= @people[0].name %> is...</p>
 </div>
 
 <div>
-  <p class="person-status"><% if @person.alive? %>ALIVE<% else %>DEAD<% end %></p>
+  <p class="person-status"><% if @people[0].alive? %>ALIVE<% else %>DEAD<% end %></p>
 </div>
 
 <%= render :partial => 'search_form' %>
