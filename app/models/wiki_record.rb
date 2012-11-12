@@ -33,6 +33,14 @@ class WikiRecord < ActiveRecord::Base
     record
   end
 
+  def name
+    infohash(:name)
+  end
+
+  def unique_name
+    humanize_article_title article_title
+  end
+
   def redirect
     return @redirect if @redirect
     ensure_read
