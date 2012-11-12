@@ -1,7 +1,8 @@
 class SearchController < ApplicationController
   include WikiHelper
 
-  before_filter :fetch, :except => [:search]
+  def index
+  end
 
   def search
     if params[:q] && !params[:q].blank?
@@ -19,16 +20,18 @@ class SearchController < ApplicationController
   end
 
   def disambiguate
+    @article_title = repair_link params[:page]
+    fetch
   end
 
   def fetch
     @result = WikiRecord.fetch @article_title
     if @result.disambiguation?
       @people = @result.targets.map do |link|
-        Person.get_person_for_wiki_record link
+        Person.person_for_wiki_record link rescue ArticleNotPerson
       end
     else
-      @people = [] << Person.get_person_for_wiki_record(@result)
+      @people = [] << Person.person_for_wiki_record(@result)
     end
   end
 end

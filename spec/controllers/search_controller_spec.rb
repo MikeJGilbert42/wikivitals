@@ -29,4 +29,13 @@ describe SearchController do
       end
     end
   end
+
+  describe "GET index" do
+    before do
+      get :index
+    end
+    it "renders successfully" do
+      response.should render_template("index")
+    end
+  end
 end

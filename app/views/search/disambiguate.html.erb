@@ -1,8 +1,8 @@
 <p class='instructions'>Got a disambiguation page.  Choose one:</p>
 
-<% @people.each do |person| %>
+<% @result.targets.each do |article| %>
   <div>
-    <%= link_to person %>
+    <%= link_to article.unique_name, person %>
   </div>
 <% end %>
 
