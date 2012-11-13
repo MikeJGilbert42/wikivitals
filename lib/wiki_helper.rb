@@ -12,9 +12,17 @@ module WikiHelper
       name.gsub!(/The|And|Of/) { $&.downcase }
       name.concat(parenthetical || "").gsub(" ", "_")
     end
+
+    def humanize_article_title link
+      link.humanze
+    end
   end
 
   def repair_link link
     self.class.repair_link link
+  end
+
+  def humanize_article_title link
+    self.class.humanize_article_title link
   end
 end

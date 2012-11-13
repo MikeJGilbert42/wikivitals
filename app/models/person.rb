@@ -18,7 +18,7 @@ class Person < ActiveRecord::Base
   end
 
   # Find the Person corresponding to this record or create it if not found.
-  def self.get_person_for_wiki_record record
+  def self.person_for_wiki_record record
     find_person record.article_title
   end
 
@@ -26,9 +26,9 @@ class Person < ActiveRecord::Base
 
   def self.new_from_wiki_record record
     if !record.person?
-      raise Exceptions::ArticleNotPerson.new "Not a person"
+      raise Exceptions::ArticleNotPerson.new "The article with title #{record.article_title} is not a person"
     end
-    name = record.infohash(:name)
+    name = record.name
     birth_date = record.birth_date
     death_date = record.death_date
     article_title = record.article_title
