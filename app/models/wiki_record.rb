@@ -108,7 +108,7 @@ class WikiRecord < ActiveRecord::Base
 
   def disambiguation?
     return @is_disambiguation if !@is_disambiguation.nil?
-    @is_disambiguation = article_body =~ /may refer to/i
+    @is_disambiguation = article_body =~ /{{hndis[^}]*}}/i
   end
 
   private

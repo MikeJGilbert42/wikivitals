@@ -140,6 +140,10 @@ describe WikiRecord do
         it { should be_disambiguation }
         it { should have(8).targets }
       end
+      context "Jack White disambiguation page" do
+        let(:article_name) { "John_White" }
+        it { should be_disambiguation }
+      end
     end
   end
 end
