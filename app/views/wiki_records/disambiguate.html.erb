@@ -2,7 +2,7 @@
 
 <% @result.targets.each do |article| %>
   <div>
-    <%= link_to article.unique_name, person %>
+    <%= link_to article.unique_name, wiki_record_path(article) %>
   </div>
 <% end %>
 

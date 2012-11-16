@@ -41,6 +41,10 @@ class WikiRecord < ActiveRecord::Base
     humanize_article_title article_title
   end
 
+  def to_param
+    article_title
+  end
+
   def redirect
     return @redirect if @redirect
     ensure_read
@@ -122,6 +126,7 @@ class WikiRecord < ActiveRecord::Base
       link_titles = disambiguation_links_from_body
       link_titles.each do |title|
         article = WikiRecord.fetch title rescue Exceptions::ArticleNotFound # swallow this error; broken links exist sometimes.
+        next if targets.pluck(:article_title).include? title
         targets << article if article && (article.person? || article.disambiguation?)
       end
     else

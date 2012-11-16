@@ -14,7 +14,7 @@ describe WikiRecordsController do
     context "with a query yielding a unique result" do
       let(:query_string) { "Barack Obama" }
       it "redirects to the show Person page" do
-        response.should redirect_to barack
+        response.should render_template :show
       end
     end
     context "with a query yielding a disambiguation page" do

@@ -17,10 +17,6 @@ class PeopleController < ApplicationController
     @person = Person.find(params[:id]) if @person.nil?
   end
 
-  def disambiguate
-    #TODO: The user will need to choose between various Person results here.
-  end
-
   private
 
   def render_article_not_found(exception)

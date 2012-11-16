@@ -8,9 +8,16 @@ class WikiRecordsController < ApplicationController
       if @result.disambiguation?
         redirect_to :action => :disambiguate, :page => @result.article_title
       else
-        redirect_to person_path Person.person_for_wiki_record(@result).id
+        @person = Person.person_for_wiki_record @result
+        render :show
       end
     end
+  end
+
+  def show
+    @article_title = params[:article_title]
+    fetch
+    @person = Person.person_for_wiki_record @result
   end
 
   def disambiguate
