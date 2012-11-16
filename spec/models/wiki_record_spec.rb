@@ -65,6 +65,10 @@ describe WikiRecord do
         let(:article_name) { "Joe_Dean" }
         it { should be_alive }
       end
+      context "naming a person with no infobox" do
+        let(:article_name) { "John_Smith_(explorer)" }
+        its(:name) { should == "John Smith" }
+      end
       context "ancient dead people" do
         context "Socrates" do
           let(:article_name) { "Socrates" }
@@ -94,9 +98,9 @@ describe WikiRecord do
   describe "#fetch" do
     it "handles redirects" do
       einstein = WikiRecord.fetch "Einstein"
-      einstein.infohash(:name).should == "Albert Einstein"
+      einstein.article_title.should == "Albert_Einstein"
       sam_neil = WikiRecord.fetch "Sam_Neil"
-      sam_neil.infohash(:name).should == "Sam Neill"
+      sam_neil.article_title.should == "Sam_Neill"
     end
 
     it "handles Abe Lincoln's redirect" do

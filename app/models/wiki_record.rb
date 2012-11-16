@@ -34,7 +34,7 @@ class WikiRecord < ActiveRecord::Base
   end
 
   def name
-    infohash(:name)
+    infohash(:name) || infohash(:alt_name) || unique_name
   end
 
   def unique_name
@@ -215,9 +215,6 @@ class WikiRecord < ActiveRecord::Base
       @infohash[:death_date] = parse_date_template @infohash[:death_date] if (@infohash[:death_date])
       @infohash[:birth_date] = parse_date_template @infohash[:birth_date] if (@infohash[:birth_date])
     end
-
-    #Infer name if not present
-    @infohash[:name] = article_title.gsub('_', ' ') if @infohash[:name].nil?
     #Backup means of determining liveness
     @infohash[:alive_category] = !(body.index(/Category:Living people/).nil?)
     @infohash[:dead_category] = !(body.index(/Category:\d+ deaths/).nil?)
@@ -229,6 +226,7 @@ class WikiRecord < ActiveRecord::Base
     return unless @persondata
     @infohash[:alt_birth_date] = parse_date_template Regexp.last_match[1] if @persondata =~ /DATE OF BIRTH\s*=(.*)$/i
     @infohash[:alt_death_date] = parse_date_template Regexp.last_match[1] if @persondata =~ /DATE OF DEATH\s*=(.*)$/i
+    @infohash[:alt_name] = "#{$2.strip} #{$1.strip}" if @persondata =~ /NAME\s*=(.*)\s*,\s*(.*)$/i
   end
 
   def disambiguation_links_from_body
