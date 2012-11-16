@@ -1,5 +1,4 @@
 class WikiFetcher
-  include WikiHelper
   require 'net/http'
 
   #todo: keep a session alive for fetching multiple requests
