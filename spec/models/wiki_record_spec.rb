@@ -69,6 +69,11 @@ describe WikiRecord do
         let(:article_name) { "John_Smith_(explorer)" }
         its(:name) { should == "John Smith" }
       end
+      context "people with HTML in their names" do
+        let(:article_name) { "Elton_John" }
+        its(:name) { should_not =~ /<br \/>/ }
+        its(:name) { should_not =~ /\[\[[^\]]*\]\]/ }
+      end
       context "ancient dead people" do
         context "Socrates" do
           let(:article_name) { "Socrates" }

@@ -34,11 +34,15 @@ class WikiRecord < ActiveRecord::Base
   end
 
   def name
-    infohash(:name) || infohash(:alt_name) || unique_name
+    @name ||= strip_extra_from_name(infohash(:name) || infohash(:alt_name) || unique_name)
   end
 
   def unique_name
     humanize_article_title article_title
+  end
+
+  def strip_extra_from_name name_string
+    name_string.gsub(/(<[^>].*>|\[\[).*/, "")
   end
 
   def to_param
