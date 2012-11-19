@@ -6,6 +6,7 @@ class WikiRecord < ActiveRecord::Base
   has_many :targets, :through => :links
 
   OLD_AGE_CUTOFF = 150
+  DISAMBIGUATION_TEMPLATES = ["hndis", "disambig"]
 
   # Retrieve article based on query string, traversing redirects unless specified.
   def self.fetch page_name, options = {}
@@ -112,7 +113,7 @@ class WikiRecord < ActiveRecord::Base
 
   def disambiguation?
     return @is_disambiguation if !@is_disambiguation.nil?
-    @is_disambiguation = article_body =~ /{{hndis[^}]*}}/i
+    @is_disambiguation = !!has_disambiguation_template?(article_body)
   end
 
   private
@@ -235,5 +236,10 @@ class WikiRecord < ActiveRecord::Base
 
   def disambiguation_links_from_body
     article_body.to(article_body.index('==See also==') || -1).scan(/\*\s*\[\[(.*?)\]\]/).flatten.map { |b| repair_link b }
+  end
+
+  def has_disambiguation_template? body
+    templates = DISAMBIGUATION_TEMPLATES.join("|")
+    /{{(?:#{templates})[^}]*}}/i =~ body
   end
 end
