@@ -11,30 +11,42 @@ data relationship modeling, performance optimization, AJAX forms, and jQuery UI.
 * Fetches raw Wikipedia Templates for article names and parses to determine vitals, personhood
 * Attempts to translate entered queries into likely article names
 * Follows article redirects
-* Saves Wikipedia articles in database to prevent over-fetching
+* Saves downloaded Wikipedia articles in database as a cache
+* Disambiguation pages presented interactively to the user
 
 == Roadmap
-* Disambiguation pages presented interactively to the user
+* Twitter Bootstrap theming
 * AJAX page updates
 * Live global feed showing other users' queries
 
-== Usage
+== Examples
 
-Here's an example of what it can do right now from the rails console (with some illustrative excerpts of debug output):
+Some functionality examples from the Rails console (with some debug output):
 
-       $ albert = Person.find_article("Einstein")
+=== Basic operation
+       $ albert = Person.find_person("Einstein")
        opening connection to en.wikipedia.org...
        opened
        <- "GET /w/index.php?action=raw&title=Einstein...
        -> "#REDIRECT [[Albert_Einstein]] {{R_from_surname}}"
        <- "GET /w/index.php?action=raw&title=Albert_Einstein
        -> "{{Infobox scientist\n| name = Albert Einstein\n...
-       => #<Person id: 65, alive: false, updated_at: "2012-07-11 18:13:40", name: "Albert Einstein", ...
+       # => #<Person id: 65, alive: false, updated_at: "2012-07-11 18:13:40", name: "Albert Einstein", ...
        $ albert.alive?
-        => false 
+       # => false 
        albert.article_title
-        => "Albert_Einstein"
+       # => "Albert_Einstein"
        albert.birth_date
-        => Fri, 14 Mar 1879
-       $ WikiFetcher.get("Sherlock_Holmes").person?
-        => false
+       # => Fri, 14 Mar 1879
+
+=== Personhood detection
+       $ WikiRecord.fetch("Sherlock_Holmes").person?
+       # => false
+
+=== Disambiguation page parsing
+       $ smiths = WikiRecord.fetch("John_Smith")
+       # => #<WikiRecord id: 467, article_title: "John_Smith", article_body: ... >
+       $ smiths.targets.count      # Get the number of people linked to from this disambiguation page
+       # => 150
+       $ smiths.targets.select(&:alive?)
+       # => 57
