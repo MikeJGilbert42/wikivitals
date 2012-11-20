@@ -1,6 +1,9 @@
 class WikiRecordsController < ApplicationController
   include WikiHelper
 
+  rescue_from ArticleNotFound, :with => :render_article_not_found
+  rescue_from ArticleNotPerson, :with => :render_not_person
+
   def search
     if params[:q] && !params[:q].blank?
       @article_title = repair_link params[:q]
@@ -21,11 +24,23 @@ class WikiRecordsController < ApplicationController
   end
 
   def disambiguate
-    @article_title = repair_link params[:page]
+    @article_title = params[:page]
     fetch
   end
 
   def fetch
     @result = WikiRecord.fetch @article_title
+  end
+
+  private
+
+  def render_article_not_found(exception)
+    @error_message = exception.message
+    render 'article_not_found'
+  end
+
+  def render_not_person(exception)
+    @error_message = exception.message
+    render 'not_person'
   end
 end

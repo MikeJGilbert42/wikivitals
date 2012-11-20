@@ -28,7 +28,7 @@ class WikiRecord < ActiveRecord::Base
     unless record
       begin
         body = WikiFetcher.get_article_body page_name
-      rescue ArticleNotFound => exception
+      rescue Exceptions::ArticleNotFound => exception
         raise exception if repaired_name == page_name
         body = WikiFetcher.get_article_body repaired_name
       end

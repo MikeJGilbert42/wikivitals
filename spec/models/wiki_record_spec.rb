@@ -25,13 +25,12 @@ describe WikiRecord do
     it "handles double redirects" do
       WikiRecord.where(article_title: "Albert_Einstein").first.delete
       lambda { WikiRecord.fetch "Einstine" }.should change { WikiRecord.all.count }.by(3)
-      one = WikiRecord.where(article_title: "Einstine").first
-      two = WikiRecord.where(article_title: "Einstein").first
-      three = WikiRecord.where(article_title: "Albert_Einstein").first
-      [one, two, three].map(&:targets).map(&:count).should == [1, 1, 0]
+      [WikiRecord.where(article_title: "Einstine").first,
+       WikiRecord.where(article_title: "Einstein").first,
+       WikiRecord.where(article_title: "Albert_Einstein").first
+      ].map(&:targets).map(&:count).should == [1, 1, 0]
     end
   end
-
 
   describe "reading article bodies better" do
     subject { WikiRecord.fetch article_name }
@@ -149,6 +148,14 @@ describe WikiRecord do
         let(:article_name) { "John_White" }
         it { should be_disambiguation }
       end
+    end
+  end
+
+  describe "not-found handling", :focus => true do
+    it "searches normal and fixed urls before erroring out" do
+      WikiFetcher.should_receive(:get_article_body).once.with("not_the_article").and_raise(Exceptions::ArticleNotFound)
+      WikiFetcher.should_receive(:get_article_body).once.with("Not_the_Article").and_raise(Exceptions::ArticleNotFound)
+      lambda { WikiRecord.fetch "not_the_article" }.should raise_error(Exceptions::ArticleNotFound)
     end
   end
 end
