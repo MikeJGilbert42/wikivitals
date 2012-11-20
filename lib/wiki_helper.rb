@@ -6,11 +6,16 @@ module WikiHelper
     def repair_link link
       return nil if link.nil?
       link = fix_case link.gsub("_", " ")
-      link.gsub(" ", "_")
+      underscorize link
     end
 
     def humanize_article_title link
       fix_case link.gsub("_", " ")
+    end
+
+    def underscorize link
+      return nil if link.nil?
+      link.gsub(" ", "_")
     end
 
     private
@@ -31,5 +36,9 @@ module WikiHelper
 
   def humanize_article_title link
     self.class.humanize_article_title link
+  end
+
+  def underscorize link
+    self.class.underscorize link
   end
 end
