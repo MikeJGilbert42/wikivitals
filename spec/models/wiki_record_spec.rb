@@ -151,7 +151,7 @@ describe WikiRecord do
     end
   end
 
-  describe "not-found handling", :focus => true do
+  describe "not-found handling" do
     it "searches normal and fixed urls before erroring out" do
       WikiFetcher.should_receive(:get_article_body).once.with("not_the_article").and_raise(Exceptions::ArticleNotFound)
       WikiFetcher.should_receive(:get_article_body).once.with("Not_the_Article").and_raise(Exceptions::ArticleNotFound)
