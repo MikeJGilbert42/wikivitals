@@ -165,16 +165,19 @@ class WikiRecord < ActiveRecord::Base
     return Date.parse Regexp.last_match[1..3].reverse.join("-") if Regexp.last_match && Regexp.last_match.length >= 3
 
     # Process * Year [And Age] template
-    if input =~ /\{\{.*?year(?: and age)?\|(\d+\s?(B\.?C)?).*?\}\}/i
+    if input =~ /\{\{.*?year(?: and age)?\|(\d+)\s?(B\.?C\.?)?.*?\}\}/i
       return make_date_from_year "#{Regexp.last_match[1]} #{Regexp.last_match[2]}"
     end
 
-    # Check to see if it parses as a plain text date (see Alexander Hamilton)
-    return Date.parse input.gsub(/\([^\)]*\)/, "") rescue ArgumentError
+    # Check to see if it parses as a plain text date (see Alexander Hamilton).
+    # Limiting to presence of 4-digit years.
+    if input =~ /\d{4}/
+      return Date.parse input.gsub(/\([^\)]*\)/, "") rescue ArgumentError
+    end
 
     # If nothing else worked, maybe it contains a plain text year.
-    if input =~ /\d+\s?(B\.?C)?/i
-      return make_date_from_year Regexp.last_match[0]
+    if input =~ /\d+\s?B\.?C\.?/i || input =~ /\d+/
+      return make_date_from_year "#{Regexp.last_match[0]}"
     end
 
     return nil
