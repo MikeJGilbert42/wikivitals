@@ -66,6 +66,10 @@ class WikiRecord < ActiveRecord::Base
     @is_person = has_persondata? article_body
   end
 
+  def person_targets
+    @person_targets ||= targets.select { |t| t.person? || t.has_person_link? }
+  end
+
   def explain_living_status
     reasons = []
     reasons << "Has#{infohash(:alive_category) ? '' : ' no'} alive category"
@@ -120,6 +124,12 @@ class WikiRecord < ActiveRecord::Base
     @is_disambiguation = !!has_disambiguation_template?(article_body)
   end
 
+  protected
+
+  def has_person_link?
+    !targets.select(&:person?).empty? || !targets.select(&:disambiguation?).select(&:has_person_link?).empty?
+  end
+
   private
 
   def read_article
@@ -134,9 +144,14 @@ class WikiRecord < ActiveRecord::Base
       @infohash[:disambiguation] = true # placeholder
       link_titles = disambiguation_links_from_body
       link_titles.each do |title|
-        article = WikiRecord.fetch title rescue Exceptions::ArticleNotFound # swallow this error; broken links exist sometimes.
-        next if targets.pluck(:article_title).include? title
-        targets << article if article && (article.person? || article.disambiguation?)
+        begin
+          article = WikiRecord.fetch title
+        rescue Exceptions::ArticleNotFound
+          # broken links exist sometimes.
+          next
+        end
+        next if targets.include? article
+        targets << article if article.person? || article.disambiguation?
       end
     else
       @infohash = {}

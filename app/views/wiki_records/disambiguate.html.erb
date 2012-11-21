@@ -1,6 +1,6 @@
 <p class='instructions'>Got a disambiguation page.  Choose one:</p>
 
-<% @result.targets.each do |article| %>
+<% @links.each do |article| %>
   <div>
     <%= link_to article.unique_name, wiki_record_path(article) %>
   </div>

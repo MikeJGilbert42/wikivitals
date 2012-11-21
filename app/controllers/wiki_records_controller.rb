@@ -32,6 +32,7 @@ class WikiRecordsController < ApplicationController
   def disambiguate
     @article_title = params[:page]
     fetch
+    @links = @result.person_targets
   end
 
   private
