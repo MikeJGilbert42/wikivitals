@@ -23,16 +23,22 @@ class WikiRecordsController < ApplicationController
     @person = Person.person_for_wiki_record @result
   end
 
+  def details
+    @article_title = params[:article_title]
+    fetch
+    render :partial => 'details'
+  end
+
   def disambiguate
     @article_title = params[:page]
     fetch
   end
 
+  private
+
   def fetch
     @result = WikiRecord.fetch @article_title
   end
-
-  private
 
   def render_article_not_found(exception)
     @error_message = exception.message

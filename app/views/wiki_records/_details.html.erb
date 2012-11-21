@@ -1,0 +1,9 @@
+<ul class="reasons">
+  <li>Infobox has birth date? <%= @result.infohash(:birth_date) || "No" %></li>
+  <li>Infobox has death date? <%= @result.infohash(:death_date)  || "No" %></li>
+  <li>Persondata has birth date? <%= @result.infohash(:alt_birth_date) || "No" %></li>
+  <li>Persondata has death date? <%= @result.infohash(:alt_death_date) || "No" %></li>
+  <li>Alive category? <%= @result.infohash(:alive_category) ? "Yes" : "No" %></li>
+  <li>Dead category? <%= @result.infohash(:dead_category) ? "Yes" : "No" %></li>
+  <li>Born too long ago to be alive? <%= @result.too_old_to_be_alive? ? 'Yes' : 'No' %></li>
+</ul>

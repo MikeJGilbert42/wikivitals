@@ -5,3 +5,7 @@
 <div>
   <p class="person-status"><% if person.alive? %>ALIVE<% else %>DEAD<% end %></p>
 </div>
+
+<div id="person-details" data-article-title="<%= person.article_title%>" style="display:none">
+  <%= link_to person.article_title, "http://en.wikipedia.org/wiki/" + person.article_title %>
+</div>
