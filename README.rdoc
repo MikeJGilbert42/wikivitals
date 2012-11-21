@@ -1,5 +1,4 @@
 == WikiVitals
-
 An exploratory Rails single-serving app designed to take a query for a person and
 output whether that person is alive or dead, based on their Wikipedia article.
 Topics to explore include TDD, robust template parsing with regular expressions,
@@ -7,7 +6,6 @@ data relationship modeling, performance optimization, AJAX forms, and jQuery UI.
 
 
 == Features
-
 * Fetches raw Wikipedia Templates for article names and parses to determine vitals, personhood
 * Attempts to translate entered queries into likely article names
 * Follows article redirects
@@ -17,10 +15,10 @@ data relationship modeling, performance optimization, AJAX forms, and jQuery UI.
 == Roadmap
 * Twitter Bootstrap theming
 * AJAX page updates
-* Live global feed showing other users' queries
+* Live global feed showing other users' recent queries
+* Link to submit problem if data is incorrect
 
 == Examples
-
 Some functionality examples from the Rails console (with some debug output):
 
 === Basic operation
