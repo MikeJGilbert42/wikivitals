@@ -6,43 +6,80 @@ body {
 }
 
 .site-name {
-   text-align: center;
-   a:link    { color: black; text-decoration: none; }
-   a:hover   { color: blue; text-decoration: underline; }
-   a:visited { color: black; text-decoration: none; }
-   a:active  { color: black; text-decoration: none; }
-   font-size: 40pt;
+    text-align: center;
+    a:link    { color: black; text-decoration: none; }
+    a:visited { color: black; text-decoration: none; }
+    a:hover   { color: blue; text-decoration: underline; }
+    a:active  { color: black; text-decoration: none; }
+    font-size: 40pt;
 }
 
 p {
-   text-align: center;
-   margin: 10px;
+    text-align: center;
+    margin: 10px;
 }
 
 table {
-   width: 70%;
-   text-align: left;
+    width: 70%;
+    text-align: left;
 }
 
 .person-name {
-   font-size: 16pt;
+    font-size: 16pt;
 }
 
 .person-status {
-   font-size: 72pt;
-   font-weight: bold;
+    font-size: 72pt;
+    font-weight: bold;
 }
 
 .error-status {
-   font-size: 72pt;
-   font-weight: bold;
+    font-size: 72pt;
+    font-weight: bold;
 }
 
 .error-details {
-   font-size: 10pt;
+    font-size: 10pt;
 }
 
 .people-search {
-   text-align: center;
-   padding-top: 10px;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.disambiguation-list {
+    text-align: center;
+    list-style-type: none;
+}
+
+.reasons {
+    margin-left: auto;
+    margin-right: auto;
+    width: 400px;
+    background-color: #eeeeee;
+    list-style-type: none;
+    padding: 20px;
+
+    li {
+        padding: 5px;
+
+        &.positive {
+            background-color: #ccffcc;
+        }
+        &.somewhat-negative {
+            background-color: #ffdddd;
+        }
+        &.very-negative {
+            background-color: #ffaaaa;
+        }
+    }
+}
+
+a.wiki-external {
+    text-align: center;
+    a:link    { color: black; text-decoration: none; }
+    a:visited { color: black; text-decoration: none; }
+    a:hover   { color: blue; text-decoration: underline; }
+    a:active  { color: black; text-decoration: none; }
+    font-weight: bold;
 }

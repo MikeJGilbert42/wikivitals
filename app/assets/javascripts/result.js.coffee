@@ -13,4 +13,4 @@ $ ->
     return false
 
 updateDetails = (data) ->
-  $('#person-details').append(data).slideDown("slow")
+  $('#person-details').prepend(data).slideDown("slow")

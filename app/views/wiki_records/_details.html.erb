@@ -1,9 +1,9 @@
 <ul class="reasons">
-  <li>Infobox has birth date? <%= @result.infohash(:birth_date) || "No" %></li>
-  <li>Infobox has death date? <%= @result.infohash(:death_date)  || "No" %></li>
-  <li>Persondata has birth date? <%= @result.infohash(:alt_birth_date) || "No" %></li>
-  <li>Persondata has death date? <%= @result.infohash(:alt_death_date) || "No" %></li>
-  <li>Alive category? <%= @result.infohash(:alive_category) ? "Yes" : "No" %></li>
-  <li>Dead category? <%= @result.infohash(:dead_category) ? "Yes" : "No" %></li>
-  <li>Born too long ago to be alive? <%= @result.too_old_to_be_alive? ? 'Yes' : 'No' %></li>
+  <%= reason_date_row 'Birth date:', @result.infohash(:birth_date), 'neutral', 'neutral' %>
+  <%= reason_date_row 'Death date:', @result.infohash(:death_date), 'very-negative', 'positive' %>
+  <%= reason_date_row 'Persondata birth date:', @result.infohash(:alt_birth_date), 'neutral', 'neutral' %>
+  <%= reason_date_row 'Persondata death date:', @result.infohash(:alt_death_date), 'somewhat-negative', 'positive' %>
+  <%= reason_boolean_row 'Alive category?', @result.infohash(:alive_category), 'positive', 'neutral' %>
+  <%= reason_boolean_row 'Dead category?', @result.infohash(:dead_category), 'very-negative', 'positive' %>
+  <%= reason_boolean_row 'Born too long ago to be alive?', @result.too_old_to_be_alive?, 'very-negative', 'neutral' %>
 </ul>

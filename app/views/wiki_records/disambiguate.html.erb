@@ -1,9 +1,9 @@
 <p class='instructions'>Got a disambiguation page.  Choose one:</p>
 
-<% @links.each do |article| %>
-  <div>
-    <%= link_to article.unique_name, wiki_record_path(article) %>
-  </div>
-<% end %>
+<ul class='disambiguation-list'>
+  <% @links.each do |article| %>
+    <li><%= link_to article.unique_name, wiki_record_path(article) %></li>
+  <% end %>
+</ul>
 
 <%= render :partial => 'search_form' %>

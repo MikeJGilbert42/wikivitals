@@ -7,5 +7,5 @@
 </div>
 
 <div id="person-details" data-article-title="<%= person.article_title%>" style="display:none">
-  <%= link_to "Go to Wikipedia article", "http://en.wikipedia.org/wiki/" + person.article_title %>
+  <p><%= link_to "Go to Wikipedia article", "http://en.wikipedia.org/wiki/" + person.article_title, :class => "wiki-external", :target => "_blank" %></p>
 </div>
