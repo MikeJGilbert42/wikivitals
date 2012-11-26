@@ -1,6 +1,8 @@
 class WikiRecordsController < ApplicationController
   include WikiHelper
 
+  before_filter :get_user_color
+
   rescue_from ArticleNotFound, :with => :render_article_not_found
   rescue_from ArticleNotPerson, :with => :render_not_person
 
@@ -49,5 +51,9 @@ class WikiRecordsController < ApplicationController
   def render_not_person(exception)
     @error_message = exception.message
     render 'not_person'
+  end
+
+  def get_user_color
+    @color = user_color
   end
 end

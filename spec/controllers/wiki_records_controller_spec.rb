@@ -15,6 +15,7 @@ describe WikiRecordsController do
       let(:query_string) { "Barack Obama" }
       it "redirects to the show Person page" do
         response.should render_template :show
+        session[:color].should be
       end
     end
     context "with a query yielding a disambiguation page" do

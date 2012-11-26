@@ -9,6 +9,7 @@ gem 'sqlite3'
 gem "jquery-rails"
 gem 'pry'
 gem 'ruby-graphviz'
+gem 'color'
 
 # Gems used only for assets and not required
 # in production environments by default.
