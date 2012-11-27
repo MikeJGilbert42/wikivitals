@@ -9,13 +9,19 @@ describe WikiRecordsController do
 
   describe "GET search" do
     before :each do
+      create_current_user
       get :search, :q => query_string
     end
     context "with a query yielding a unique result" do
       let(:query_string) { "Barack Obama" }
       it "redirects to the show Person page" do
         response.should render_template :show
-        session[:color].should be
+      end
+      it "sets the user_id cookie" do
+        cookies.signed[:user_id].should be
+      end
+      it "adds a pageview for the current user" do
+        assigns[:user].page_views.count.should == 1
       end
     end
     context "with a query yielding a disambiguation page" do

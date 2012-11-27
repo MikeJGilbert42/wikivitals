@@ -24,3 +24,8 @@ def mock_wiki_fetcher
     end
   end
 end
+
+def create_current_user
+  user = FactoryGirl.create(:user)
+  cookies.signed[:user_id] = user.id
+end
