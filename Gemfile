@@ -31,6 +31,7 @@ group :test, :development do
   gem "guard"
   gem "guard-spork"
   gem "guard-rspec"
+  gem "factory_girl"
   gem "factory_girl_rails"
 #  gem "ruby-debug"
   gem 'ruby-debug19', :require => 'ruby-debug'

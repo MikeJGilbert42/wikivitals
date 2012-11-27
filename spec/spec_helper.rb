@@ -12,6 +12,7 @@ Spork.prefork do
   Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
   require 'rspec/rails'
   require 'rspec/autorun'
+  require 'factory_girl'
   RSpec.configure do |config|
     config.fixture_path = "#{::Rails.root}/spec/fixtures"
     # Use color in STDOUT
