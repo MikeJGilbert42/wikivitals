@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121010084722) do
+ActiveRecord::Schema.define(:version => 20121127195432) do
 
   create_table "links", :force => true do |t|
     t.integer  "wiki_record_id"
@@ -23,6 +23,13 @@ ActiveRecord::Schema.define(:version => 20121010084722) do
   add_index "links", ["target_id"], :name => "index_links_on_target_id"
   add_index "links", ["wiki_record_id"], :name => "index_links_on_wiki_record_id"
 
+  create_table "page_views", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "wiki_record_id"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+  end
+
   create_table "people", :force => true do |t|
     t.boolean  "alive"
     t.datetime "updated_at"
@@ -33,6 +40,12 @@ ActiveRecord::Schema.define(:version => 20121010084722) do
   end
 
   add_index "people", ["article_title"], :name => "index_people_on_article_title", :unique => true
+
+  create_table "users", :force => true do |t|
+    t.string   "color"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "wiki_records", :force => true do |t|
     t.string   "article_title"
