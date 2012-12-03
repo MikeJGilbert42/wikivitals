@@ -44,4 +44,15 @@ describe WikiRecordsController do
       response.should render_template("index")
     end
   end
+
+  describe "GET details" do
+    describe "html response" do
+      before do
+        get :details, :article_title => 'Barack Obama', :format => :html
+      end
+      it "formats the details partial" do
+        response.should render_template "_details"
+      end
+    end
+  end
 end

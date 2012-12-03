@@ -23,7 +23,6 @@ describe WikiRecord do
     end
 
     it "handles double redirects" do
-      WikiRecord.where(article_title: "Albert_Einstein").first.delete
       lambda { WikiRecord.fetch "Einstine" }.should change { WikiRecord.all.count }.by(3)
       [WikiRecord.where(article_title: "Einstine").first,
        WikiRecord.where(article_title: "Einstein").first,
