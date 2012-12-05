@@ -1,0 +1,5 @@
+{
+    "page-views": [
+        <%= render :partial => :page_view, :collection => @data, :spacer_template => 'list_spacer' %>
+    ]
+}

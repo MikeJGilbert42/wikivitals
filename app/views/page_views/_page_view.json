@@ -1,0 +1,6 @@
+{
+    "page-view-id": "<%= page_view.id %>",
+    "record": "<%= page_view.wiki_record.article_title %>",
+    "name": "<%= page_view.wiki_record.name %>",
+    "color": "<%= page_view.user.color %>"
+}
