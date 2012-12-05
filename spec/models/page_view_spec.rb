@@ -28,6 +28,10 @@ describe PageView do
       it "should be limitable" do
         PageView.recent.limit(5).count.should == 5
       end
+      it "should be scopable to entries newer than provided" do
+        last = PageView.recent[3]
+        PageView.since(last).map(&:id).should == PageView.recent[0..2].map(&:id)
+      end
     end
   end
 end
