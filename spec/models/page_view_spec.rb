@@ -25,6 +25,9 @@ describe PageView do
         PageView.recent[0].user.should == user2
         PageView.recent[1].user.should == user1
       end
+      it "should be limitable" do
+        PageView.recent.limit(5).count.should == 5
+      end
     end
   end
 end
