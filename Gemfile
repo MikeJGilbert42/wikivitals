@@ -1,4 +1,5 @@
-source 'https://rubygems.org'
+source :rubygems
+source :rubyforge
 
 gem 'rails', '3.2.2'
 
@@ -25,13 +26,15 @@ group :test do
   gem "shoulda-matchers"
   gem "webmock"
   gem 'rb-inotify', '~> 0.8.8'
+  gem "factory_girl_rails"
 end
 
 group :test, :development do
   gem "guard"
   gem "guard-spork"
   gem "guard-rspec"
-  gem "factory_girl_rails"
-#  gem "ruby-debug"
-  gem 'ruby-debug19', :require => 'ruby-debug'
+ # gem 'linecache19', '>= 0.5.13'
+  gem 'ruby-debug-base19x', '>= 0.11.30.pre10'
+  gem 'ruby-debug-ide', '>= 0.4.17.beta14'
+  gem 'ruby-debug19'
 end
